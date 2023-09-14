@@ -6,28 +6,7 @@
     <div class="row">
         <div class="col-md-3">
             <h1>Country</h1>
-            <form method="post" enctype="multipart/form-data" action="{% url 'import_country' %}">{% csrf_token %}
-                <input name="file" type="file">
-                <button type="submit">save</button>
-            </form>
-        </div>
-        <div class="col-md-3">
-            <h1>City</h1>
-            <form method="post" enctype="multipart/form-data" action="{% url 'import_city' %}">{% csrf_token %}
-                <input name="file" type="file">
-                <button type="submit">save</button>
-            </form>
-        </div>
-        <div class="col-md-3">
-            <h1>Region</h1>
-            <form method="post" enctype="multipart/form-data" action="{% url 'import_region' %}">{% csrf_token %}
-                <input name="file" type="file">
-                <button type="submit">save</button>
-            </form>
-        </div>
-        <div class="col-md-3">
-            <h1>Neighbourhood</h1>
-            <form method="post" enctype="multipart/form-data" action="{% url 'import_neighbourhood' %}">{% csrf_token %}
+            <form method="post" enctype="multipart/form-data" action="{% url 'import_address_data' %}">{% csrf_token %}
                 <input name="file" type="file">
                 <button type="submit">save</button>
             </form>
