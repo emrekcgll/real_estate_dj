@@ -3,15 +3,7 @@
 {% block content %}
 <div class="page-content">
 
-    <div class="row">
-        <div class="col-md-3">
-            <h1>Country</h1>
-            <form method="post" enctype="multipart/form-data" action="{% url 'import_address_data' %}">{% csrf_token %}
-                <input name="file" type="file">
-                <button type="submit">save</button>
-            </form>
-        </div>
-    </div>
+
 
 </div>
 {% endblock %}

@@ -1,0 +1,35 @@
+{% load static %}
+<div class="sidebar-header">
+    <div>
+        <img src={% static "adminapp/assets/images/logo-icon-2.png" %} class="logo-icon" alt="logo icon">
+    </div>
+    <div>
+        <h4 class="logo-text">Fobia</h4>
+    </div>
+</div>
+<ul class="metismenu" id="menu">
+    <li>
+        <a href="{% url 'index' %}">
+            <div class="parent-icon">
+                <ion-icon name="home-outline"></ion-icon>
+            </div>
+            <div class="menu-title">Dashboard</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'estates' %}">
+            <div class="parent-icon">
+                <ion-icon name="home-outline"></ion-icon>
+            </div>
+            <div class="menu-title">Estates</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'import_operations' %}">
+            <div class="parent-icon">
+                <ion-icon name="home-outline"></ion-icon>
+            </div>
+            <div class="menu-title">Import Address CSV</div>
+        </a>
+    </li>
+</ul>
