@@ -9,8 +9,8 @@
         <form method="post" enctype="multipart/form-data" action="{% url 'import_address_data' %}">{% csrf_token %}
             <div class="card-body">
                 <div class="mb-3">
-                    <label for="formFileLg" class="form-label">Import address file. (You can import just csv file) <br><a href="/static/address_data.csv">Example File</a></label>
-                    <input class="form-control form-control-lg" id="formFileLg" name="file" type="file">
+                    <label for="formFile" class="form-label">Import address file. (You can import just csv file) <br><a href="/static/address_data.csv">Example File</a></label>
+                    <input class="form-control" id="formFile" name="file" type="file">
                 </div>
                 <div class="mb-3">
                     <button type="submit" class="btn btn-primary">Submit</button>

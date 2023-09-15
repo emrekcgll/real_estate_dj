@@ -31,19 +31,19 @@ class Address(models.Model):
 
 
 class EstateType(models.Model):
-    estate_type = models.CharField(max_length=20) # satılık, kiralık
+    estate_type = models.CharField(max_length=20, unique=True) # Daire, Villa, Residance 
 
 
 class EstateStatus(models.Model):
-    estate_status = models.CharField(max_length=20) # Daire, Villa, Residance
+    estate_status = models.CharField(max_length=20, unique=True) # Satılık, Kiralık 
 
 
 class FromWho(models.Model):
-    from_who = models.CharField(max_length=50) # kimden, emlakcıdan, sahibinden
+    from_who = models.CharField(max_length=50, unique=True) # kimden, emlakcıdan, sahibinden
 
 
 class RoomCount(models.Model):
-    room_count = models.CharField(max_length=10) # oda sayısı
+    room_count = models.CharField(max_length=10, unique=True) # oda sayısı
 
 
 class RealEstate(models.Model):

@@ -1,0 +1,88 @@
+{% extends "adminapp/_layout.html" %}
+{% load static %}
+{% block content %}
+<div class="page-content">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Yeni Emlak Tipi</h6>
+                </div>
+                <div class="card-body">
+                    <form class="row g-3" method="post" action="{% url 'create_estate_type' %}">
+                        {% csrf_token %}
+                        <div class="col-12">
+                            {{estateTypeForm}}
+                        </div>
+                        <div class="col-12">
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Kaydet</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Yeni Emlak Statüsü</h6>
+                </div>
+                <div class="card-body">
+                    <form class="row g-3" method="post" action="{% url 'create_estate_status' %}">
+                        {% csrf_token %}
+                        <div class="col-12">
+                            {{estateStatusForm}}
+                        </div>
+                        <div class="col-12">
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Kaydet</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Yeni Satıcı</h6>
+                </div>
+                <div class="card-body">
+                    <form class="row g-3" method="post" action="{% url 'create_from_who' %}">
+                        {% csrf_token %}
+                        <div class="col-12">
+                            {{fromWhoForm}}
+                        </div>
+                        <div class="col-12">
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Kaydet</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Yeni Oda Sayısı</h6>
+                </div>
+                <div class="card-body">
+                    <form class="row g-3" method="post" action="{% url 'create_room_count' %}">
+                        {% csrf_token %}
+                        <div class="col-12">
+                            {{roomCountForm}}
+                        </div>
+                        <div class="col-12">
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Kaydet</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

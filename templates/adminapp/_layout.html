@@ -1,6 +1,7 @@
 {% load static %}
 <!doctype html>
 <html lang="en" class="semi-dark hydrated color-header headercolor7">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +9,7 @@
     {% include "adminapp/partials/_csspartial.html" %}
     {% block css %}{% endblock %}
 </head>
+
 <body>
     <div class="wrapper">
         <aside class="sidebar-wrapper" data-simplebar="true">
@@ -23,5 +25,14 @@
     </div>
     {% include "adminapp/partials/_jspartial.html" %}
     {% block script %}{% endblock %}
+
+    {% if messages %}
+    {% for message in messages %}
+    <script>
+        toastr.{{message.tags}} ("{{message}}")
+    </script>
+    {% endfor %}
+    {% endif %}
 </body>
+
 </html>

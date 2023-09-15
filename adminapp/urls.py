@@ -10,9 +10,4 @@ urlpatterns = [
 
 
     path("estate_list_ajax/", views.estate_list_ajax, name="estate_list_ajax"),
-
-
-
-    path("import-operations/", views.import_operations, name="import_operations"),
-    path("import_address_data/",views.import_address_data, name="import_address_data"),
 ]
