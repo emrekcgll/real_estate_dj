@@ -4,7 +4,7 @@
         <img src={% static "adminapp/assets/images/logo-icon-2.png" %} class="logo-icon" alt="logo icon">
     </div>
     <div>
-        <h4 class="logo-text">Fobia</h4>
+        <h4 class="logo-text">Real Estate App</h4>
     </div>
 </div>
 <ul class="metismenu" id="menu">
@@ -33,11 +33,33 @@
         </a>
     </li>
     <li>
-        <a href="{% url 'create_model' %}">
+        <a class="has-arrow" href="javascript:;">
             <div class="parent-icon">
-                <ion-icon name="home-outline"></ion-icon>
+                <ion-icon name="newspaper-outline"></ion-icon>
             </div>
-            <div class="menu-title">Create Model Operation</div>
+            <div class="menu-title">Model Operations</div>
         </a>
+        <ul>
+            <li>
+                <a href="{% url 'create_estate_type' %}">
+                    <ion-icon name="ellipse-outline"></ion-icon>Estate Type
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'create_estate_status' %}">
+                    <ion-icon name="ellipse-outline"></ion-icon>Estate Status
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'create_from_who' %}">
+                    <ion-icon name="ellipse-outline"></ion-icon>From Who
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'create_room_count' %}">
+                    <ion-icon name="ellipse-outline"></ion-icon>Room Count
+                </a>
+            </li>
+        </ul>
     </li>
 </ul>

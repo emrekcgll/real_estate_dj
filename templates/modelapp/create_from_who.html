@@ -1,0 +1,61 @@
+{% extends "adminapp/_layout.html" %}
+{% load static %}
+{% block content %}
+<div class="page-content">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Yeni Satıcı</h6>
+                </div>
+                <div class="card-body">
+                    <form class="row g-3" method="post" action="{% url 'create_from_who' %}">
+                        {% csrf_token %}
+                        <div class="col-12">
+                            {{form}}
+                        </div>
+                        <div class="col-12">
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Kaydet</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <button class="btn btn-secondary" id="showFromWho">Satıcıları Göster</button>
+            <div id="list"></div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $("#showFromWho").click(function () {
+            $.ajax({
+                url: "{% url 'show_from_who' %}",
+                method: "GET", 
+                dataType: "json",
+                success: function (response) {
+                    var data = response.data;
+                    var table = "<table class='table table-bordred'>";
+                    table += "<thead><tr><th>Satıcılar</th><th></th><th></th></tr></thead>";
+                    table += "<tbody>";
+                    $.each(data, function (index, obj) {
+                        table += "<tr><td>" + obj.from_who + "</td><td><a href=''>Güncelle</a></td><td><a href=''>Sil</a></td></tr>";
+                    });
+                    table += "</tbody>";
+                    $("#list").html(table)
+                },
+                error: function (hata) {
+                    // AJAX isteği başarısız olduğunda bu işlev çağrılır
+                    console.error("Hata: " + hata.statusText);
+                },
+            });
+        });
+    });
+</script>
+{% endblock %}

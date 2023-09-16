@@ -25,10 +25,10 @@
     </div>
     {% include "adminapp/partials/_jspartial.html" %}
     {% block script %}{% endblock %}
-
+    
     {% if messages %}
     {% for message in messages %}
-    <script>
+    <script>        
         toastr.{{message.tags}} ("{{message}}")
     </script>
     {% endfor %}

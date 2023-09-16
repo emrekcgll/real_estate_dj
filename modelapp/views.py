@@ -1,11 +1,10 @@
-from urllib import response
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from adminapp.models import City, County, Neighbourhood, Region
+from django.contrib import messages
+from adminapp.models import City, County, EstateStatus, EstateType, FromWho, Neighbourhood, Region, RoomCount
+from modelapp.forms import EstateStatusForm, EstateTypeForm, FromWhoForm, RoomCountForm
 import io
 import csv
-from django.contrib import messages
-
-from modelapp.forms import EstateStatusForm, EstateTypeForm, FromWhoForm, RoomCountForm
 
 
 def import_operations(request):
@@ -50,28 +49,16 @@ def import_address_data(request):
     return redirect('import_operations')
 
 
-def create_model(request):
-    estateTypeForm = EstateTypeForm()
-    estateStatusForm = EstateStatusForm()
-    fromWhoForm = FromWhoForm()
-    roomCountForm = RoomCountForm()
-    response = {"estateTypeForm": estateTypeForm,
-                "estateStatusForm": estateStatusForm,
-                "fromWhoForm": fromWhoForm,
-                "roomCountForm": roomCountForm}
-    return render(request, "modelapp/create_model.html", response)
-
-
 def create_estate_type(request):
     if request.method == "POST":
         form = EstateTypeForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Created successfully.")
-            return redirect("index")
         else:
             messages.error(request, "Something went wrong.")
-            return redirect("create_model")
+    form = EstateTypeForm()
+    return render(request, "modelapp/create_estate_type.html", {"form": form})
 
 
 def create_estate_status(request):
@@ -80,10 +67,10 @@ def create_estate_status(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Created successfully.")
-            return redirect("index")
         else:
             messages.error(request, "Something went wrong.")
-            return redirect("create_model")
+    form = EstateStatusForm()
+    return render(request, "modelapp/create_estate_status.html", {"form": form})
 
 
 def create_from_who(request):
@@ -92,10 +79,10 @@ def create_from_who(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Created successfully.")
-            return redirect("index")
         else:
             messages.error(request, "Something went wrong.")
-            return redirect("create_model")
+    form = FromWhoForm()
+    return render(request, "modelapp/create_from_who.html", {"form": form})
 
 
 def create_room_count(request):
@@ -104,7 +91,51 @@ def create_room_count(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Created successfully.")
-            return redirect("index")
         else:
             messages.error(request, "Something went wrong.")
-            return redirect("create_model")
+    form = RoomCountForm()
+    return render(request, "modelapp/create_room_count.html", {"form": form})
+
+
+def show_estate_type(request):
+    estate_types = EstateType.objects.all()
+    data = []
+    for i in estate_types:
+        data.append({
+            "estate_type": i.estate_type,
+        })
+    response = {"data": data}
+    return JsonResponse(response)
+
+
+def show_estate_status(request):
+    estate_status = EstateStatus.objects.all()
+    data = []
+    for i in estate_status:
+        data.append({
+            "estate_status": i.estate_status,
+        })
+    response = {"data": data}
+    return JsonResponse(response)
+
+
+def show_from_who(request):
+    from_whos = FromWho.objects.all()
+    data = []
+    for i in from_whos:
+        data.append({
+            "from_who": i.from_who,
+        })
+    response = {"data": data}
+    return JsonResponse(response)
+
+
+def show_room_count(request):
+    room_counts = RoomCount.objects.all()
+    data = []
+    for i in room_counts:
+        data.append({
+            "room_count": i.room_count,
+        })
+    response = {"data": data}
+    return JsonResponse(response)
