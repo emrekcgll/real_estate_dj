@@ -139,3 +139,19 @@ def show_room_count(request):
         })
     response = {"data": data}
     return JsonResponse(response)
+
+
+def delete_estate_type(request, pk):
+    pass
+
+
+def delete_estate_status(request, pk):
+    pass
+
+
+def delete_from_who(request, pk):
+    pass
+
+
+def delete_room_count(request, pk):
+    pass

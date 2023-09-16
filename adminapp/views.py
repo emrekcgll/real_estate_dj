@@ -5,7 +5,6 @@ from adminapp.models import RealEstate
 
 # Create your views here.
 
-
 def index(request):
     return render(request, 'adminapp/index.html')
 

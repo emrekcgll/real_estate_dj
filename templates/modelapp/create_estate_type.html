@@ -35,11 +35,10 @@
 <script>
     $(document).ready(function () {
         $("#showEstateType").click(function () {
-            // AJAX isteği gönder
             $.ajax({
-                url: "{% url 'show_estate_type' %}", // Verilerin alınacağı URL
-                method: "GET", // GET isteği kullanabilirsiniz, isteğe bağlı olarak POST da kullanabilirsiniz
-                dataType: "json", // Sunucudan gelecek veri türü (JSON, XML, vb.)
+                url: "{% url 'show_estate_type' %}",
+                method: "GET",
+                dataType: "json",
                 success: function (response) {
                     var data = response.data;
                     var table = "<table class='table table-bordred'>";
@@ -52,7 +51,6 @@
                     $("#list").html(table)
                 },
                 error: function (hata) {
-                    // AJAX isteği başarısız olduğunda bu işlev çağrılır
                     console.error("Hata: " + hata.statusText);
                 },
             });
