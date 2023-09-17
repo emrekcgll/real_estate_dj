@@ -45,7 +45,7 @@
                     table += "<thead><tr><th>Oda Sayısı</th><th></th><th></th></tr></thead>";
                     table += "<tbody>";
                     $.each(data, function (index, obj) {
-                        table += "<tr><td>" + obj.room_count + "</td><td><a href=''>Güncelle</a></td><td><a href=''>Sil</a></td></tr>";
+                        table += `<tr><td>${obj.room_count}</td><td><a href="/web/model-operations/update_room_count/${obj.pk}/">Güncelle</a></td><td><a href="/web/model-operations/delete_room_count/${obj.pk}/">Sil</a></td></tr>`;
                     });
                     table += "</tbody>";
                     $("#list").html(table)

@@ -45,7 +45,7 @@
                     table += "<thead><tr><th>Emlak Statüsü</th><th></th><th></th></tr></thead>";
                     table += "<tbody>";
                     $.each(data, function (index, obj) {
-                        table += "<tr><td>" + obj.estate_status + "</td><td><a href=''>Güncelle</a></td><td><a href=''>Sil</a></td></tr>";
+                        table += `<tr><td>${obj.estate_status}</td><td><a href="/web/model-operations/update_estate_status/${obj.pk}/">Güncelle</a></td><td><a href="/web/model-operations/delete_estate_status/${obj.pk}/">Sil</a></td></tr>`;
                     });
                     table += "</tbody>";
                     $("#list").html(table)
