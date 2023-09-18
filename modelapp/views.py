@@ -49,8 +49,6 @@ def import_address_data(request):
     return redirect('import_operations')
 
 
-
-
 def show_estate_type(request):
     estate_types = EstateType.objects.all()
     data = []
@@ -97,8 +95,6 @@ def show_room_count(request):
         })
     response = {"data": data}
     return JsonResponse(response)
-
-
 
 
 def create_estate_type(request):
@@ -149,8 +145,6 @@ def create_room_count(request):
     return render(request, "modelapp/create_room_count.html", {"form": form})
 
 
-
-
 def delete_estate_type(request, pk):
     value = get_object_or_404(EstateType, pk=pk)
     value.delete()
@@ -179,8 +173,6 @@ def delete_room_count(request, pk):
     return redirect("create_room_count")
 
 
-
-
 def update_estate_type(request, pk):
     value = get_object_or_404(EstateType, pk=pk)
     if request.method == "POST":
@@ -188,7 +180,6 @@ def update_estate_type(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Updated successfully.")
-            return redirect("create_estate_type")
         else:
             messages.error(request, "Something went wrong.")
     form = EstateTypeForm(instance=value)
@@ -202,7 +193,6 @@ def update_estate_status(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Updated successfully.")
-            return redirect("create_estate_status")
         else:
             messages.error(request, "Something went wrong.")
     form = EstateStatusForm(instance=value)
@@ -216,7 +206,6 @@ def update_from_who(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Updated successfully.")
-            return redirect("create_from_who")
         else:
             messages.error(request, "Something went wrong.")
     form = FromWhoForm(instance=value)
@@ -230,9 +219,7 @@ def update_room_count(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Updated successfully.")
-            return redirect("create_room_count")
         else:
             messages.error(request, "Something went wrong.")
     form = RoomCountForm(instance=value)
     return render(request, "modelapp/update_room_count.html", {"form": form})
-

@@ -1,38 +1,29 @@
 {% load static %}
-<!doctype html>
-<html lang="en" class="semi-dark hydrated color-header headercolor7">
+<!-- INSPINIA - Responsive Admin Theme version 2.8-->
+<!DOCTYPE html>
+<html>
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>INSPINIA | Dashboard</title>
     {% include "adminapp/partials/_csspartial.html" %}
-    {% block css %}{% endblock %}
 </head>
 
 <body>
-    <div class="wrapper">
-        <aside class="sidebar-wrapper" data-simplebar="true">
-            {% include "adminapp/partials/_asidepartial.html" %}
-        </aside>
-        <header class="top-header">
-            {% include "adminapp/partials/_headerpartial.html" %}
-        </header>
-        <div class="page-content-wrapper">
+    <div id="wrapper">
+        {% include "adminapp/partials/_navbarpartial.html" %}
+        <div id="page-wrapper" class="gray-bg dashbard-1">
+            {% include "adminapp/partials/_headpartial.html" %}
+
             {% block content %}{% endblock %}
+            
+            {% include "adminapp/partials/_footerpartial.html" %}
         </div>
-        <div class="overlay nav-toggle-icon"></div>
     </div>
-    {% include "adminapp/partials/_jspartial.html" %}
+    {% include "adminapp/partials/_scriptpartial.html" %}
     {% block script %}{% endblock %}
-    
-    {% if messages %}
-    {% for message in messages %}
-    <script>        
-        toastr.{{message.tags}} ("{{message}}")
-    </script>
-    {% endfor %}
-    {% endif %}
 </body>
 
 </html>
