@@ -21,6 +21,8 @@
                                 <th>County</th>
                                 <th>Region</th>
                                 <th>Room Count</th>
+                                <th style="width:1px;"></th>
+                                <th style="width:1px;"></th>
                             </tr>
                         </thead>
                     </table>
@@ -34,19 +36,17 @@
 <script>
     $(document).ready(function () {
         $('#data-table').DataTable({
-            lengthMenu: [10, 25, 50, 100],
+            lengthMenu: [10, 15, 20,25],
+            serverSide: true,
+            processing: true,
             responsive: true,
-            ordering: true,
+            ordering: false,
             dom: '<"html5buttons"B>lTfgitp',
-            buttons: [
-                { extend: 'csv', title: 'document' },
-                { extend: 'excel', title: 'document' },
-                { extend: 'pdf', title: 'document' },
-            ],
+            buttons: [],
             ajax: {
                 url: '{% url "estate_list_ajax" %}',
                 type: 'GET',
-                contentType: 'json',
+                contentType: 'application/json',
                 data: function (data) {
                     return data;
                 },
@@ -64,6 +64,18 @@
                 { data: 'county' },
                 { data: 'region' },
                 { data: 'room_count' },
+                {
+                    data: 'pk',
+                    render: function(data){
+                        return `<a href="/web/estate/${data}/" class="btn btn-success">View</a>`
+                    }
+                },
+                {
+                    data: 'pk',
+                    render: function(data){
+                        return `<a href="" class="btn btn-info">Update</a>`
+                    }
+                },
             ]
         });
     });
