@@ -21,15 +21,8 @@ class Region(models.Model): # semt
     def __str__(self):
         return self.region_name
 
-class Neighbourhood(models.Model): # mahalle
-    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
-    neighbourhood_name = models.CharField(max_length=100)
-    neighbourhood_zip = models.CharField(max_length=10)
-    def __str__(self):
-        return self.neighbourhood_name
-
 class Address(models.Model):
-    neighbourhood = models.ForeignKey(Neighbourhood, on_delete=models.SET_NULL, null=True, blank=True)
+    Region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.CharField(max_length=500)
     def __str__(self):
         return self.address
@@ -58,7 +51,6 @@ class RealEstate(models.Model):
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
     county = models.ForeignKey(County, on_delete=models.SET_NULL, null=True, blank=True)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
-    neighbourhood = models.ForeignKey(Neighbourhood, on_delete=models.SET_NULL, null=True, blank=True)
     estate_type = models.ForeignKey(EstateType, on_delete=models.SET_NULL, null=True, blank=True)
     estate_status = models.ForeignKey(EstateStatus, on_delete=models.SET_NULL, null=True, blank=True)
     from_who = models.ForeignKey(FromWho, on_delete=models.SET_NULL, null=True, blank=True) 
@@ -73,7 +65,7 @@ class RealEstate(models.Model):
     created_date = models.DateField(auto_now_add=True)
     m2_brut = models.CharField(max_length=10) 
     m2_net = models.CharField(max_length=10) 
-    using_status = models.CharField(max_length=10)
+    using_status = models.CharField(max_length=10, null=True, blank=True)
     building_years = models.CharField(max_length=10) # bina yaşı
     building_floor = models.CharField(max_length=10) # bina katı
     bathrooms_count = models.CharField(max_length=10) # banyo sayısı
@@ -88,3 +80,8 @@ class RealEstate(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+
+class Image(models.Model):
+    real_estate = models.ForeignKey(RealEstate, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="estate_images/")

@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
-from adminapp.models import City, County, EstateStatus, EstateType, FromWho, Neighbourhood, Region, RoomCount
+from adminapp.models import City, County, EstateStatus, EstateType, FromWho, Region, RoomCount
 from modelapp.forms import EstateStatusForm, EstateTypeForm, FromWhoForm, RoomCountForm
 import io
 import csv
@@ -22,8 +22,6 @@ def import_address_data(request):
                 city_name_csv = row[0].strip().title()
                 county_name_csv = row[1].strip().title()
                 region_name_csv = row[2].strip().title()
-                neighbourhood_name_csv = row[3].strip().title()
-                neighbourhood_zip_csv = row[4].strip()
                 try:
                     City.objects.get(city_name=city_name_csv)
                 except City.DoesNotExist:
@@ -39,13 +37,6 @@ def import_address_data(request):
                 except Region.DoesNotExist:
                     region = Region(county=county, region_name=region_name_csv)
                     region.save()
-                try:
-                    Neighbourhood.objects.get(
-                        neighbourhood_name=neighbourhood_name_csv)
-                except Neighbourhood.DoesNotExist:
-                    neighbourhood = Neighbourhood(
-                        region=region, neighbourhood_name=neighbourhood_name_csv, neighbourhood_zip=neighbourhood_zip_csv)
-                    neighbourhood.save()
     return redirect('import_operations')
 
 
