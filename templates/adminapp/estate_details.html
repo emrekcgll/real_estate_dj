@@ -1,76 +1,151 @@
 {% extends "adminapp/_layout.html" %}
 {% load static %}
+{% load humanize %}
 {% block content %}
 <div class="row mt-3">
     <div class="col-lg-12">
         <div class="ibox product-detail">
             <div class="ibox-content">
                 <div class="row">
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <div class="product-images">
                             {% for image in images %}
-                            <div>
-                                <div class="image-imitation">
-                                    <img src="{{ image.image.url }}">
-                                </div>
-                            </div>
+                            <img style="max-width: 100%; height:auto" src="{{ image.image.url }}">
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="col-md-7">
+                    <div class="col-md-8">
                         <h2 class="font-bold m-b-xs">
                             {{estate.title}}
                         </h2>
-                        <small>Many desktop publishing packages and web page editors now.</small>
                         <div class="m-t-md">
-                            <h2 class="product-main-price">$406,602 <small class="text-muted">Exclude Tax</small> </h2>
+                            <h2 class="product-main-price">
+                                {{estate.price|intcomma}} ₺
+                            </h2>
                         </div>
                         <hr>
-
-                        <h4>Product description</h4>
-
-                        <div class="small text-muted">
-                            It is a long established fact that a reader will be distracted by the readable
-                            content of a page when looking at its layout. The point of using Lorem Ipsum is
-
-                            <br />
-                            <br />
-                            There are many variations of passages of Lorem Ipsum available, but the majority
-                            have suffered alteration in some form, by injected humour, or randomised words
-                            which don't look even slightly believable.
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Adres</h4>
+                                <div class="text-muted">
+                                    {{estate.address}}<br> {{estate.region}} / {{estate.county}} / {{estate.city}}
+                                </div><br>
+                                <table class="table table-bordred">
+                                    <tr>
+                                        <th>Emlak Tipi</th>
+                                        <td>{{estate.estate_status}} {{estate.estate_type}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>m² (Brüt)</th>
+                                        <td>{{estate.m2_brut}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>m² (Net)</th>
+                                        <td>{{estate.m2_net}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Oda Sayısı</th>
+                                        <td>{{estate.room_count}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Bina Yaşı</th>
+                                        <td>{{estate.building_years}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Bulunduğu Kat</th>
+                                        <td>{{estate.location_floor}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Kat Sayısı</th>
+                                        <td>{{estate.building_floor}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Isıtma</th>
+                                        <td>{{estate.heating}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Banyo Sayısı</th>
+                                        <td>{{estate.bathrooms_count}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Balkon</th>
+                                        <td>{{estate.is_balcony}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Eşyalı</th>
+                                        <td>{{estate.is_with_firniture}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Kullanım Durumu</th>
+                                        <td>{{estate.using_status}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Site İçerisinde</th>
+                                        <td>{{estate.within_site}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Site Adı</th>
+                                        <td>{{estate.site_name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Aidat</th>
+                                        <td>{{estate.dues|intcomma}} ₺</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Krediye Uygun</th>
+                                        <td>{{estate.is_available_for_loan}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Tapu Durumu</th>
+                                        <td>{{estate.deed_status}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Kimden</th>
+                                        <td>{{estate.from_who}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Takas</th>
+                                        <td>{{estate.change}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-5">
+                                    <h4>Description</h4>
+                                    <div class="text-muted">
+                                        {{estate.description}}
+                                    </div>
+                                </div>
+                                {% if estate.estate_owner %}
+                                <div class="contact-box">
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h3><i class="fa fa-address-card"></i> Estate Owner</h3>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <button class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Update Owner</button>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <p><i class="fa fa-user"></i> {{estate.estate_owner.name_surname}}</p>
+                                        <a href="tel:{{estate.estate_owner.phone}}"><i class="fa fa-phone"></i> {{estate.estate_owner.phone}}</a>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
-                        <dl class="small m-t-md">
-                            <dt>Description lists</dt>
-                            <dd>A description list is perfect for defining terms.</dd>
-                            <dt>Euismod</dt>
-                            <dd>Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.</dd>
-                            <dd>Donec id elit non mi porta gravida at eget metus.</dd>
-                            <dt>Malesuada porta</dt>
-                            <dd>Etiam porta sem malesuada magna mollis euismod.</dd>
-                        </dl>
                         <hr>
                         <div>
                             <div class="btn-group">
-                                <button class="btn btn-primary btn-sm"><i class="fa fa-cart-plus"></i> Add to
-                                    cart</button>
-                                <button class="btn btn-white btn-sm"><i class="fa fa-star"></i> Add to wishlist
-                                </button>
-                                <button class="btn btn-white btn-sm"><i class="fa fa-envelope"></i> Contact with author
-                                </button>
+                                <button class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Update Estate</button>
+                                <button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Delete Estate</button>
                             </div>
                         </div>
                     </div>
                 </div>
-
-            </div>
-            <div class="ibox-footer">
-                <span class="float-right">
-                    <i class="fa fa-clock-o"></i> {{estate.created_date}}
-                </span>
-                The generated Lorem Ipsum is therefore always free
             </div>
         </div>
-
     </div>
 </div>
 {% endblock %}

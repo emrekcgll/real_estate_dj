@@ -47,7 +47,14 @@ class RoomCount(models.Model):
     def __str__(self):
         return self.room_count
 
+
+class EstateOwner(models.Model):
+    name_surname = models.CharField(max_length=200)
+    phone = models.CharField(max_length=15)
+
+
 class RealEstate(models.Model):
+    estate_owner = models.ForeignKey(EstateOwner, on_delete=models.SET_NULL, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
     county = models.ForeignKey(County, on_delete=models.SET_NULL, null=True, blank=True)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
@@ -56,23 +63,27 @@ class RealEstate(models.Model):
     from_who = models.ForeignKey(FromWho, on_delete=models.SET_NULL, null=True, blank=True) 
     room_count = models.ForeignKey(RoomCount, on_delete=models.SET_NULL, null=True, blank=True)
 
-
     address = models.CharField(max_length=1000)
     title = models.CharField(max_length=100)
+    price = models.PositiveIntegerField()
     slug = models.SlugField(max_length=300, db_index=True)
     description = models.CharField(max_length=1000)
     estate_number = models.CharField(max_length=10) # GUID ID
     created_date = models.DateField(auto_now_add=True)
     m2_brut = models.CharField(max_length=10) 
     m2_net = models.CharField(max_length=10) 
-    using_status = models.CharField(max_length=10, null=True, blank=True)
+    heating = models.CharField(max_length=100) # ısıtma şekli
+    using_status = models.CharField(max_length=10, null=True, blank=True) # kullanım durumu
     building_years = models.CharField(max_length=10) # bina yaşı
     building_floor = models.CharField(max_length=10) # bina katı
+    location_floor = models.CharField(max_length=10) # bulunduğu kat
     bathrooms_count = models.CharField(max_length=10) # banyo sayısı
-    is_with_firniture = models.BooleanField(default=False) # eşyalı eşyasız
+    within_site = models.BooleanField(default=False) # site içerisinde mi
+    site_name = models.CharField(max_length=75, null=True, blank=True) # site adı
+    is_with_firniture = models.BooleanField(default=False) # eşyalı mi
     dues = models.CharField(max_length=10) # aidat
-    is_available_for_loan = models.BooleanField(default=False) # krediye uygun
-    is_balcony = models.BooleanField(default=False)
+    is_available_for_loan = models.BooleanField(default=False) # krediye uygun mu
+    is_balcony = models.BooleanField(default=False) # balkon var mı
     deed_status = models.CharField(max_length=100) # tapu durumu
     change = models.BooleanField(default=False) # takas
 
@@ -80,6 +91,8 @@ class RealEstate(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+
 
 
 class Image(models.Model):

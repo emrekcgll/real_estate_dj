@@ -1,10 +1,12 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from adminapp.forms import RealEstateForm
-from adminapp.models import County, Image, RealEstate, Region
+from adminapp.models import County, EstateOwner, Image, RealEstate, Region
 from django.core.paginator import Paginator
 from django.db.models import Q
-import timeit
+import os
+from django.conf import settings
+from django.db import transaction
 
 
 def index(request):
@@ -21,28 +23,68 @@ def estate_details(request, pk):
     return render(request, "adminapp/estate_details.html", {"estate": estate, "images": images})
 
 
+@transaction.atomic
 def estate_create(request):
     if request.method == "POST":
         form = RealEstateForm(request.POST, request.FILES)
         if form.is_valid():
-            data = form.save(commit=False)
-            county = request.POST.get("county")
-            region = request.POST.get("region")
-            county_instance = County.objects.get(pk=county)
-            region_instance = Region.objects.get(pk=region)
-            data.county = county_instance
-            data.region = region_instance
-            data.save()
+            try:
+                data = form.save(commit=False)
+    
+                name_surname = request.POST.get("name_surname")
+                phone = request.POST.get("phone")
+                if name_surname!= "":
+                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={"name_surname": name_surname})
+                    estate_owner_instance = get_object_or_404(EstateOwner, pk=estate_owner.pk)
+                    data.estate_owner = estate_owner_instance
 
-            estate_instance = RealEstate.objects.get(pk=data.pk)
-            files = request.FILES.getlist("image")
-            for image in files:
-                Image.objects.create(real_estate=estate_instance, image=image)
-            return redirect("estates")
+                county_id = request.POST.get("county")
+                region_id = request.POST.get("region")
+                county_instance = get_object_or_404(County, pk=county_id)
+                region_instance = get_object_or_404(Region, pk=region_id)
+
+                data.county = county_instance
+                data.region = region_instance
+                data.save()
+
+                estate_instance = get_object_or_404(RealEstate, pk=data.pk)
+                files = request.FILES.getlist("image")
+                for image in files:
+                    Image.objects.create(real_estate=estate_instance, image=image)
+                
+                return redirect("estates")
+            except Exception as e:
+                # Herhangi bir hata durumunda işlemi geri al
+                transaction.set_rollback(True)
+                print(f"Hata: {e}")
+                return redirect("estates")
     else:
         form = RealEstateForm()
+    
     response = {"form": form}
     return render(request, "adminapp/estatecreate.html", response)
+
+
+@transaction.atomic
+def estate_delete(request, pk):
+    try:
+        real_estate = get_object_or_404(RealEstate, pk=pk)
+        images = Image.objects.filter(real_estate=real_estate)
+        for image in images:
+            os.remove(os.path.join(settings.MEDIA_ROOT, image.image.name))
+        images.delete()
+        real_estate.delete()
+        return redirect("estates")
+    except Exception as e:
+        transaction.set_rollback(True)
+        print(f"Hata: {e}")
+        return redirect("estates")
+
+
+def estate_update(request, pk):
+    real_estate = get_object_or_404(RealEstate, pk=pk)
+    form = RealEstateForm(instance=real_estate)
+    return render(request, "adminapp/estateupdate.html", {"form": form})
 
 
 def estate_list_ajax(request):

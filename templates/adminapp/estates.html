@@ -22,7 +22,6 @@
                                 <th>Region</th>
                                 <th>Room Count</th>
                                 <th style="width:1px;"></th>
-                                <th style="width:1px;"></th>
                             </tr>
                         </thead>
                     </table>
@@ -68,12 +67,6 @@
                     data: 'pk',
                     render: function(data){
                         return `<a href="/web/estate/${data}/" class="btn btn-success">View</a>`
-                    }
-                },
-                {
-                    data: 'pk',
-                    render: function(data){
-                        return `<a href="" class="btn btn-info">Update</a>`
                     }
                 },
             ]
