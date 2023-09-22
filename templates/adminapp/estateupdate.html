@@ -15,7 +15,8 @@
                             {{form.title.errors}}
                         </div>
                     </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.room_count.label}}</label>
+                    <div class="form-group  row"><label
+                            class="col-sm-2 col-form-label">{{form.room_count.label}}</label>
                         <div class="col-sm-10">
                             {{form.room_count}}
                             {{form.room_count.errors}}
@@ -91,12 +92,14 @@
                         <div class="col-sm-10">
                             <select class="form-control" id="county" name="county">
                             </select>
+                            {{form.county.errors}}
                         </div>
                     </div>
                     <div class="form-group  row"><label class="col-sm-2 col-form-label">Semt</label>
                         <div class="col-sm-10">
                             <select class="form-control" id="region" name="region">
                             </select>
+                            {{form.region.errors}}
                         </div>
                     </div>
                     <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.address.label}}</label>
@@ -184,11 +187,7 @@
                             {{form.price.errors}}
                         </div>
                     </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">Resimler</label>
-                        <div class="col-sm-10">
-                            <input type="file" name="image" multiple required>
-                        </div>
-                    </div>
+
                     <div class="hr-line-dashed"></div>
                     <div class="form-group row">
                         <div class="col-sm-4 col-sm-offset-2">
@@ -201,54 +200,46 @@
         </div>
         <div class="col-lg-5">
             <div class="ibox">
-                <div class="ibox-title">
-                    <h5>Estate Owner</h5>
-                </div>
                 <div class="ibox-content">
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">Name Surname</label>
-                        <div class="col-sm-10">
-                            <input type="text" name="name_surname" class="form-control">
-                        </div>
+                    <div class="product-images">
+                        {% for image in images %}
+                        <img style="max-width: 100%; height:auto" src="{{ image.image.url }}">
+                        {% endfor %}
                     </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">Phone</label>
-                        <div class="col-sm-10">
-                            <input type="tel" name="phone" class="form-control">
-                        </div>
-                    </div>
+                    <br>
                 </div>
             </div>
         </div>
     </div>
 </form>
+{{error_message}}
 
 {% endblock %}
 {% block script %}
 <script>
     $(document).ready(function () {
-        $("#id_city").change(function () {
-            var selectedId = $(this).val();
-            console.log(selectedId)
-            $.ajax({
-                url: '/web/get_county_by_city_id/' + selectedId + '/',
-                method: "GET",
-                dataType: "json",
-                success: function (data) {
-                    $("#county").empty();
+        var selectedId = $("#id_city").val();
+        console.log(selectedId)
+        $.ajax({
+            url: '/web/get_county_by_city_id/' + selectedId + '/',
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                $("#county").empty();
+                $("#county").append($("<option>", {
+                    value: "0",
+                    text: "NULL"
+                }));
+                $.each(data, function (index, value) {
                     $("#county").append($("<option>", {
-                        value: "0",
-                        text: "NULL"
+                        value: value.pk,
+                        text: value.county_name
                     }));
-                    $.each(data, function (index, value) {
-                        $("#county").append($("<option>", {
-                            value: value.pk,
-                            text: value.county_name
-                        }));
-                    });
-                },
-                error: function () {
-                    alert("Error!");
-                }
-            });
+                });
+            },
+            error: function () {
+                alert("Error!");
+            }
         });
         $("#county").change(function () {
             var selectedId = $(this).val();
@@ -274,6 +265,9 @@
                     alert("Error!");
                 }
             });
+        });
+        $('.product-images').slick({
+            dots: true,
         });
     });
 </script>

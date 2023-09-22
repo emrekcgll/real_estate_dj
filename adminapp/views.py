@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from adminapp.forms import RealEstateForm
+from adminapp.forms import EstateOwnerForm, RealEstateForm
 from adminapp.models import County, EstateOwner, Image, RealEstate, Region
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -79,12 +79,46 @@ def estate_delete(request, pk):
         transaction.set_rollback(True)
         print(f"Hata: {e}")
         return redirect("estates")
-
+  
 
 def estate_update(request, pk):
     real_estate = get_object_or_404(RealEstate, pk=pk)
-    form = RealEstateForm(instance=real_estate)
-    return render(request, "adminapp/estateupdate.html", {"form": form})
+    estate_owner = real_estate.estate_owner.pk if real_estate.estate_owner else None
+    images = Image.objects.filter(real_estate=real_estate)
+    if request.method == "POST":
+        form = RealEstateForm(request.POST, instance=real_estate)
+        if form.is_valid():
+            data = form.save(commit=False)
+                            
+            county_id = request.POST.get("county")
+            region_id = request.POST.get("region")
+            county_instance = get_object_or_404(County, pk=county_id)
+            region_instance = get_object_or_404(Region, pk=region_id)
+            estate_owner_instance = get_object_or_404(EstateOwner, pk=estate_owner) if estate_owner else None
+
+            data.county = county_instance
+            data.region = region_instance
+            data.estate_owner = estate_owner_instance
+
+            data.save()
+            return redirect("estate_details", pk=real_estate.pk)
+    else:
+        form = RealEstateForm(instance=real_estate)
+    return render(request, "adminapp/estateupdate.html", {"form": form, "images":images})
+
+
+def update_owner(request, pk):
+    estate_pk = request.GET.get("estate_pk")
+    estate_owner = get_object_or_404(EstateOwner, pk=pk)
+    if request.method == "POST":
+        form = EstateOwnerForm(request.POST, instance=estate_owner)
+        if form.is_valid():
+            form.save()
+            return redirect("estate_details", pk=estate_pk)
+    else:
+        form = EstateOwnerForm(instance=estate_owner)
+    return render(request, "adminapp/ownerupdate.html", {"form":form})
+
 
 
 def estate_list_ajax(request):

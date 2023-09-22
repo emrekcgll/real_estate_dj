@@ -13,4 +13,7 @@ urlpatterns = [
     path("estate_list_ajax/", views.estate_list_ajax, name="estate_list_ajax"),
     path("get_county_by_city_id/<int:city_id>/", views.get_county_by_city_id, name="get_county_by_city_id"),
     path("get_region_by_county_id/<int:county_id>/", views.get_region_by_county_id, name="get_region_by_county_id"),
+
+
+    path("update-owner/<int:pk>/", views.update_owner, name="update_owner")
 ]
