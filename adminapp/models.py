@@ -50,7 +50,9 @@ class RoomCount(models.Model):
 
 class EstateOwner(models.Model):
     name_surname = models.CharField(max_length=200)
+    job = models.CharField(max_length=20, null=True, blank=True)
     phone = models.CharField(max_length=15)
+    address = models.CharField(max_length=150, null=True, blank=True)
 
 
 class RealEstate(models.Model):

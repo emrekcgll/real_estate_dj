@@ -13,14 +13,24 @@ def index(request):
     return render(request, 'adminapp/index.html')
 
 
+
+
+
+
+
+
+
+
+
 def estates(request):
     return render(request, "adminapp/estates.html")
 
 
 def estate_details(request, pk):
     estate = get_object_or_404(RealEstate, pk=pk)
+    estate_s= estate.estate_status
     images = Image.objects.filter(real_estate=estate)
-    return render(request, "adminapp/estate_details.html", {"estate": estate, "images": images})
+    return render(request, "adminapp/estatedetails.html", {"estate": estate, "images": images, "estate_s": estate_s})
 
 
 @transaction.atomic
@@ -30,12 +40,17 @@ def estate_create(request):
         if form.is_valid():
             try:
                 data = form.save(commit=False)
-    
+
                 name_surname = request.POST.get("name_surname")
                 phone = request.POST.get("phone")
-                if name_surname!= "":
-                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={"name_surname": name_surname})
-                    estate_owner_instance = get_object_or_404(EstateOwner, pk=estate_owner.pk)
+                address = request.POST.get("address")
+                job = request.POST.get("job")
+
+                if name_surname != "":
+                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={
+                                                                              "name_surname": name_surname, "phone": phone, "address": address, "job": job})
+                    estate_owner_instance = get_object_or_404(
+                        EstateOwner, pk=estate_owner.pk)
                     data.estate_owner = estate_owner_instance
 
                 county_id = request.POST.get("county")
@@ -50,8 +65,9 @@ def estate_create(request):
                 estate_instance = get_object_or_404(RealEstate, pk=data.pk)
                 files = request.FILES.getlist("image")
                 for image in files:
-                    Image.objects.create(real_estate=estate_instance, image=image)
-                
+                    Image.objects.create(
+                        real_estate=estate_instance, image=image)
+
                 return redirect("estates")
             except Exception as e:
                 # Herhangi bir hata durumunda işlemi geri al
@@ -60,7 +76,7 @@ def estate_create(request):
                 return redirect("estates")
     else:
         form = RealEstateForm()
-    
+
     response = {"form": form}
     return render(request, "adminapp/estatecreate.html", response)
 
@@ -79,7 +95,7 @@ def estate_delete(request, pk):
         transaction.set_rollback(True)
         print(f"Hata: {e}")
         return redirect("estates")
-  
+
 
 def estate_update(request, pk):
     real_estate = get_object_or_404(RealEstate, pk=pk)
@@ -89,12 +105,13 @@ def estate_update(request, pk):
         form = RealEstateForm(request.POST, instance=real_estate)
         if form.is_valid():
             data = form.save(commit=False)
-                            
+
             county_id = request.POST.get("county")
             region_id = request.POST.get("region")
             county_instance = get_object_or_404(County, pk=county_id)
             region_instance = get_object_or_404(Region, pk=region_id)
-            estate_owner_instance = get_object_or_404(EstateOwner, pk=estate_owner) if estate_owner else None
+            estate_owner_instance = get_object_or_404(
+                EstateOwner, pk=estate_owner) if estate_owner else None
 
             data.county = county_instance
             data.region = region_instance
@@ -104,10 +121,34 @@ def estate_update(request, pk):
             return redirect("estate_details", pk=real_estate.pk)
     else:
         form = RealEstateForm(instance=real_estate)
-    return render(request, "adminapp/estateupdate.html", {"form": form, "images":images})
+    return render(request, "adminapp/estateupdate.html", {"form": form, "images": images})
 
 
-def update_owner(request, pk):
+
+
+
+def owners(request):
+    owner = EstateOwner.objects.all()
+    return render(request, "adminapp/owners.html", {"owner": owner})
+
+
+def owner_details(request, pk):
+    owner = get_object_or_404(EstateOwner, pk=pk)
+    return render(request, "adminapp/ownerdetails.html", {"owner": owner})
+
+
+def owner_create(request):
+    if request.method == "POST":
+        form = EstateOwnerForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("owners")
+    else:
+        form = EstateOwnerForm()
+    return render(request, "adminapp/ownercreate.html", {"form": form})
+
+
+def owner_update(request, pk):
     estate_pk = request.GET.get("estate_pk")
     estate_owner = get_object_or_404(EstateOwner, pk=pk)
     if request.method == "POST":
@@ -117,7 +158,18 @@ def update_owner(request, pk):
             return redirect("estate_details", pk=estate_pk)
     else:
         form = EstateOwnerForm(instance=estate_owner)
-    return render(request, "adminapp/ownerupdate.html", {"form":form})
+    return render(request, "adminapp/ownerupdate.html", {"form": form})
+
+
+def owner_delete(request, pk):
+    owner = get_object_or_404(EstateOwner, pk=pk)
+    owner.delete()
+    return redirect("owners")
+
+
+
+
+
 
 
 

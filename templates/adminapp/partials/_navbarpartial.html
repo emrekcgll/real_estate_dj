@@ -25,6 +25,9 @@
             <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
                 <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Estate</span></a>
             </li>
+            <li class="{% if request.resolver_match.url_name == 'owners' %}active{% endif %}">
+                <a href="{% url 'owners' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Owner List</span></a>
+            </li>
             <li>
                 <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Model APP</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">
