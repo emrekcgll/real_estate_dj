@@ -5,12 +5,12 @@ from adminapp.models import EstateOwner, RealEstate
 class EstateOwnerForm(forms.ModelForm):
     class Meta:
         model = EstateOwner
-        fields = ("name_surname", "phone", "job", "address")
-        labels = {"name_surname": "Ad Soyad", "phone": "Telefon", "job": "Meslek", "address": "Adres" }
+        fields = ("name_surname", "identity_number", "phone", "address")
+        labels = {"name_surname": "Ad Soyad", "identity_number": "TC", "phone": "Telefon", "address": "Adres" }
         widgets = {"name_surname": forms.TextInput(attrs={"class": "form-control"}),
+                   "identity_number": forms.TextInput(attrs={"class": "form-control"}),
                    "phone": forms.NumberInput(attrs={"class": "form-control"}),
-                   "address": forms.TextInput(attrs={"class": "form-control"}),
-                   "job": forms.TextInput(attrs={"class": "form-control"})}
+                   "address": forms.TextInput(attrs={"class": "form-control"})}
 
 
 class RealEstateForm(forms.ModelForm):

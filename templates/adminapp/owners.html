@@ -10,8 +10,8 @@
         <div class="contact-box">
             <a class="row" href="{% url 'owner_details' pk=item.pk %}">
                 <div class="col-8">
-                    <h6>{{item.job}}</h6>
                     <h3><strong>{{item.name_surname}}</strong></h3>
+                    <h6>{{item.identity_number}}</h6>
                     <p><i class="fa fa-map-marker"></i>{{item.address}}</p>
                     <p><i class="fa fa-phone"></i> {{item.phone}}</p>
                 </div>

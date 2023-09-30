@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'accountapp',
     'adminapp',
     'modelapp',
     'homeapp',
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'adminapp.middlewares.SuperuserCheckMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -84,7 +86,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3_estate',
     }
 }
 
@@ -129,6 +131,9 @@ STATICFILES_DIRS  = [BASE_DIR/"static"]
 MEDIA_URL = "media/"
 MEDIA_ROOT = os.path.join(BASE_DIR / "media")
 
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'login'
 
 INTERNAL_IPS = [
     '127.0.0.1',

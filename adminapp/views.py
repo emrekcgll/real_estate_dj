@@ -13,22 +13,13 @@ def index(request):
     return render(request, 'adminapp/index.html')
 
 
-
-
-
-
-
-
-
-
-
 def estates(request):
     return render(request, "adminapp/estates.html")
 
 
 def estate_details(request, pk):
     estate = get_object_or_404(RealEstate, pk=pk)
-    estate_s= estate.estate_status
+    estate_s = estate.estate_status
     images = Image.objects.filter(real_estate=estate)
     return render(request, "adminapp/estatedetails.html", {"estate": estate, "images": images, "estate_s": estate_s})
 
@@ -44,11 +35,10 @@ def estate_create(request):
                 name_surname = request.POST.get("name_surname")
                 phone = request.POST.get("phone")
                 address = request.POST.get("address")
-                job = request.POST.get("job")
+                identity_number = request.POST.get("identity_number")
 
                 if name_surname != "":
-                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={
-                                                                              "name_surname": name_surname, "phone": phone, "address": address, "job": job})
+                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={"name_surname": name_surname, "phone": phone, "address": address, "identity_number": identity_number})
                     estate_owner_instance = get_object_or_404(
                         EstateOwner, pk=estate_owner.pk)
                     data.estate_owner = estate_owner_instance
@@ -124,9 +114,6 @@ def estate_update(request, pk):
     return render(request, "adminapp/estateupdate.html", {"form": form, "images": images})
 
 
-
-
-
 def owners(request):
     owner = EstateOwner.objects.all()
     return render(request, "adminapp/owners.html", {"owner": owner})
@@ -165,12 +152,6 @@ def owner_delete(request, pk):
     owner = get_object_or_404(EstateOwner, pk=pk)
     owner.delete()
     return redirect("owners")
-
-
-
-
-
-
 
 
 def estate_list_ajax(request):

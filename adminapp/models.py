@@ -21,24 +21,24 @@ class Region(models.Model): # semt
     def __str__(self):
         return self.region_name
 
-class Address(models.Model):
+class Address(models.Model): # ev adresi
     Region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.CharField(max_length=500)
     def __str__(self):
         return self.address
 
 class EstateType(models.Model):
-    estate_type = models.CharField(max_length=20, unique=True) # Daire, Villa, Residance 
+    estate_type = models.CharField(max_length=30, unique=True) # Daire, Villa, Residance 
     def __str__(self):
         return self.estate_type
 
 class EstateStatus(models.Model):
-    estate_status = models.CharField(max_length=20, unique=True) # Satılık, Kiralık 
+    estate_status = models.CharField(max_length=30, unique=True) # Satılık, Kiralık 
     def __str__(self):
         return self.estate_status
 
 class FromWho(models.Model):
-    from_who = models.CharField(max_length=50, unique=True) # kimden, emlakcıdan, sahibinden
+    from_who = models.CharField(max_length=30, unique=True) # kimden, emlakcıdan, sahibinden
     def __str__(self):
         return self.from_who
 
@@ -48,10 +48,12 @@ class RoomCount(models.Model):
         return self.room_count
 
 
+
+
 class EstateOwner(models.Model):
     name_surname = models.CharField(max_length=200)
-    job = models.CharField(max_length=20, null=True, blank=True)
-    phone = models.CharField(max_length=15)
+    identity_number = models.CharField(max_length=11, null=True, blank=True)
+    phone = models.CharField(max_length=11)
     address = models.CharField(max_length=150, null=True, blank=True)
 
 
@@ -93,8 +95,6 @@ class RealEstate(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
-
-
 
 
 class Image(models.Model):
