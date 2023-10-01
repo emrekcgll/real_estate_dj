@@ -20,5 +20,10 @@ urlpatterns = [
     path("owner-update/<int:pk>/", views.owner_update, name="owner_update"),
     path("owner-delete/<int:pk>/", views.owner_delete, name="owner_delete"),
 
+    path("renters/", views.renters, name="renters"),
+    path("renter/<int:pk>/", views.renter_details, name="renter_details"),
     path("renter-create/<int:pk>/", views.renter_create, name="renter_create"),
+    path("renter-update/<int:pk>/", views.renter_update, name="renter_update"),
+
+    path("renter-delete/<int:pk>/", views.renter_delete, name="renter_delete"),
 ]

@@ -1,7 +1,6 @@
-from numbers import Real
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from adminapp.forms import EstateOwnerForm, RealEstateForm
+from adminapp.forms import EstateOwnerForm, EstateRenterForm, RealEstateForm
 from adminapp.models import County, EstateOwner, EstateRenter, Image, RealEstate, Region
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -14,17 +13,18 @@ def index(request):
     return render(request, 'adminapp/index.html')
 
 
+# ESTATE OPERATIONS
 def estates(request):
     return render(request, "adminapp/estates.html")
 
 
 def estate_details(request, pk):
     estate = get_object_or_404(RealEstate, pk=pk)
-    estate_renter = get_object_or_404(EstateRenter, real_estate=estate)
+    estate_renter = EstateRenter.objects.filter(real_estate=estate).first()
     estate_s = estate.estate_status
     images = Image.objects.filter(real_estate=estate)
-    return render(request, "adminapp/estatedetails.html", {"estate": estate, 
-                                                           "images": images, 
+    return render(request, "adminapp/estatedetails.html", {"estate": estate,
+                                                           "images": images,
                                                            "estate_s": estate_s,
                                                            "estate_renter": estate_renter})
 
@@ -120,6 +120,7 @@ def estate_update(request, pk):
     return render(request, "adminapp/estateupdate.html", {"form": form, "images": images})
 
 
+# OWNER OPERATIONS
 def owners(request):
     owner = EstateOwner.objects.all()
     return render(request, "adminapp/owners.html", {"owner": owner})
@@ -148,7 +149,10 @@ def owner_update(request, pk):
         form = EstateOwnerForm(request.POST, instance=estate_owner)
         if form.is_valid():
             form.save()
-            return redirect("estate_details", pk=estate_pk)
+            if estate_pk:
+                return redirect("estate_details", pk=estate_pk)
+            else:
+                return redirect("owners")
     else:
         form = EstateOwnerForm(instance=estate_owner)
     return render(request, "adminapp/ownerupdate.html", {"form": form})
@@ -158,6 +162,17 @@ def owner_delete(request, pk):
     owner = get_object_or_404(EstateOwner, pk=pk)
     owner.delete()
     return redirect("owners")
+
+
+# RENTER OPERATIONS
+def renters(request):
+    renters = EstateRenter.objects.all()
+    return render(request, "adminapp/renters.html", {"renters": renters})
+
+
+def renter_details(request, pk):
+    renter = get_object_or_404(EstateRenter, pk=pk)
+    return render(request, "adminapp/renterdetails.html", {"renter": renter})
 
 
 def renter_create(request, pk):
@@ -176,11 +191,29 @@ def renter_create(request, pk):
     return render(request, "adminapp/rentercreate.html")
 
 
+def renter_update(request, pk):
+    estate_pk = request.GET.get("estate_pk")
+    estate_renter = get_object_or_404(EstateRenter, pk=pk)
+    if request.method == "POST":
+        form = EstateRenterForm(request.POST, instance=estate_renter)
+        if form.is_valid():
+            form.save()
+            if estate_pk:
+                return redirect("estate_details", pk=estate_pk)
+            else:
+                return redirect("renters")
+    else:
+        form = EstateOwnerForm(instance=estate_renter)
+    return render(request, "adminapp/renterupdate.html", {"form": form})
 
 
+def renter_delete(request, pk):
+    renter = get_object_or_404(EstateRenter, pk=pk)
+    renter.delete()
+    return redirect("renters")
 
 
-
+# AJAX OPERATIONS
 def estate_list_ajax(request):
     # DataTables'ın çizim numarasını alın
     draw = int(request.GET.get('draw', 1))
