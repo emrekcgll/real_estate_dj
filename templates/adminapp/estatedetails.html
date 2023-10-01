@@ -26,8 +26,10 @@
                                 </h2>
                             </div>
                             <div class="col-md-6 text-right">
+                                {% if not estate_renter %}
                                 {% if estate_s|lower == "kiralık" %}
-                                <a href="" class="btn btn-success">Kiracı Ekle</a>
+                                <a href="{% url 'renter_create' pk=estate.pk %}" class="btn btn-success">Kiracı Ekle</a>
+                                {% endif %}
                                 {% elif estate_s|lower == "satılık" %}
                                 <a href="" class="btn btn-success">Alıcı Ekle</a>
                                 {% endif %}
@@ -132,12 +134,12 @@
                                     <div class="col-12">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <h3><i class="fa fa-address-card"></i> Estate Owner</h3>
+                                                <h3><i class="fa fa-address-card"></i> Ev Sahibi</h3>
                                             </div>
                                             <div class="col-md-6 text-right">
                                                 <form action="{% url 'owner_update' pk=estate.estate_owner.pk %}">{% csrf_token %}
                                                     <input type="hidden" name="estate_pk" value="{{estate.pk}}">
-                                                    <button class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Update Owner</button>
+                                                    <button class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Ev Sahibi Bilgilerini Güncelle</button>
                                                 </form>
                                             </div>
                                         </div>
@@ -145,6 +147,27 @@
                                         <p><i class="fa fa-user"></i> {{estate.estate_owner.name_surname}}</p>
                                         <a href="tel:{{estate.estate_owner.phone}}"><i class="fa fa-phone"></i> {{estate.estate_owner.phone}}</a><br>
                                         <a href="tel:{{estate.estate_owner.address}}"><i class="fa fa-map-marker"></i> {{estate.estate_owner.address}}</a><br>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if estate_renter %}
+                                <div class="contact-box">
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h3><i class="fa fa-address-card"></i> Kiracı</h3>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <form action="">{% csrf_token %}
+                                                    <input type="hidden" name="estate_pk" value="{{estate.pk}}">
+                                                    <button class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Kiracı Bilgilerini Güncelle</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <p><i class="fa fa-user"></i> {{estate_renter.name_surname}}</p>
+                                        <a href="tel:{{estate_renter.phone}}"><i class="fa fa-phone"></i> {{estate_renter.phone}}</a><br>
+                                        <a href="tel:{{estate_renter.address}}"><i class="fa fa-map-marker"></i> {{estate_renter.address}}</a><br>
                                     </div>
                                 </div>
                                 {% endif %}

@@ -1,7 +1,8 @@
+from numbers import Real
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from adminapp.forms import EstateOwnerForm, RealEstateForm
-from adminapp.models import County, EstateOwner, Image, RealEstate, Region
+from adminapp.models import County, EstateOwner, EstateRenter, Image, RealEstate, Region
 from django.core.paginator import Paginator
 from django.db.models import Q
 import os
@@ -19,9 +20,13 @@ def estates(request):
 
 def estate_details(request, pk):
     estate = get_object_or_404(RealEstate, pk=pk)
+    estate_renter = get_object_or_404(EstateRenter, real_estate=estate)
     estate_s = estate.estate_status
     images = Image.objects.filter(real_estate=estate)
-    return render(request, "adminapp/estatedetails.html", {"estate": estate, "images": images, "estate_s": estate_s})
+    return render(request, "adminapp/estatedetails.html", {"estate": estate, 
+                                                           "images": images, 
+                                                           "estate_s": estate_s,
+                                                           "estate_renter": estate_renter})
 
 
 @transaction.atomic
@@ -38,7 +43,8 @@ def estate_create(request):
                 identity_number = request.POST.get("identity_number")
 
                 if name_surname != "":
-                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={"name_surname": name_surname, "phone": phone, "address": address, "identity_number": identity_number})
+                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={
+                                                                              "name_surname": name_surname, "phone": phone, "address": address, "identity_number": identity_number})
                     estate_owner_instance = get_object_or_404(
                         EstateOwner, pk=estate_owner.pk)
                     data.estate_owner = estate_owner_instance
@@ -152,6 +158,27 @@ def owner_delete(request, pk):
     owner = get_object_or_404(EstateOwner, pk=pk)
     owner.delete()
     return redirect("owners")
+
+
+def renter_create(request, pk):
+    estate = get_object_or_404(RealEstate, pk=pk)
+    if request.method == "POST":
+        name_surname = request.POST.get("name_surname")
+        phone = request.POST.get("phone")
+        address = request.POST.get("address")
+        identity_number = request.POST.get("identity_number")
+        EstateRenter.objects.create(
+            name_surname=name_surname,
+            identity_number=identity_number,
+            phone=phone, address=address,
+            real_estate=estate)
+        return redirect("estate_details", pk=estate.pk)
+    return render(request, "adminapp/rentercreate.html")
+
+
+
+
+
 
 
 def estate_list_ajax(request):

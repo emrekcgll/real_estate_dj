@@ -1,3 +1,5 @@
+from ast import mod
+from pyexpat import model
 from django.db import models
 from django.utils.text import slugify
 
@@ -48,12 +50,10 @@ class RoomCount(models.Model):
         return self.room_count
 
 
-
-
 class EstateOwner(models.Model):
     name_surname = models.CharField(max_length=200)
     identity_number = models.CharField(max_length=11, null=True, blank=True)
-    phone = models.CharField(max_length=11)
+    phone = models.CharField(max_length=11, null=True, blank=True)
     address = models.CharField(max_length=150, null=True, blank=True)
 
 
@@ -95,6 +95,28 @@ class RealEstate(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+
+class EstateRenter(models.Model):
+    real_estate = models.ForeignKey(RealEstate, on_delete=models.CASCADE, null=True, blank=True)
+    name_surname = models.CharField(max_length=200)
+    identity_number = models.CharField(max_length=11, null=True, blank=True)
+    phone = models.CharField(max_length=11, null=True, blank=True)
+    address = models.CharField(max_length=150, null=True, blank=True)
+
+
+class Contrat(models.Model):
+    estate = models.ForeignKey(RealEstate, on_delete=models.CASCADE, null=True, blank=True )
+    estate_owner = models.ForeignKey(EstateOwner, on_delete=models.CASCADE, null=True, blank=True )
+    estate_renter = models.ForeignKey(EstateRenter, on_delete=models.CASCADE, null=True, blank=True )
+    contract_start_date = models.DateTimeField(auto_now_add=True)
+    contract_duration = models.PositiveIntegerField()
+    year_rental_price = models.PositiveIntegerField()
+    mounth_rental_price = models.PositiveIntegerField()
+    rent_payment_method = models.CharField(max_length=200)
+    how_to_use_the_rented_property = models.CharField(max_length=200)
+    status_of_the_rented_property = models.CharField(max_length=200)
+    fixtures_delivered_with_the_rental = models.CharField(max_length=200)
 
 
 class Image(models.Model):
