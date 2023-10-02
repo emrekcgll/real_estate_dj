@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from adminapp.forms import EstateOwnerForm, EstateRenterForm, RealEstateForm
-from adminapp.models import County, EstateOwner, EstateRenter, Image, RealEstate, Region
+from adminapp.models import County, EstateOwner, EstateRenter, EstateStatus, Image, RealEstate, Region
 from django.core.paginator import Paginator
 from django.db.models import Q
 import os
@@ -16,6 +16,19 @@ def index(request):
 # ESTATE OPERATIONS
 def estates(request):
     return render(request, "adminapp/estates.html")
+
+
+def estates_on_sale(request):
+    return render(request, "adminapp/estates_on_sale.html")
+
+def estates_on_sold(request): 
+    return render(request, "adminapp/estates_on_sold.html")
+
+def estates_on_rent(request): 
+    return render(request, "adminapp/estates_on_rent.html")
+
+def estates_on_rented(request):
+    return render(request, "adminapp/estates_on_rented.html")
 
 
 def estate_details(request, pk):
@@ -260,7 +273,8 @@ def estate_list_ajax(request):
     return JsonResponse(response)
 
 
-def non_rental_estate_list_ajax(request):
+def estates_on_rented_list_ajax(request):
+    estate_status = get_object_or_404(EstateStatus, estate_status="Kiralık")
     # DataTables'ın çizim numarasını alın
     draw = int(request.GET.get('draw', 1))
     start = int(request.GET.get('start', 0))  # Başlangıç indeksi
@@ -269,7 +283,7 @@ def non_rental_estate_list_ajax(request):
     search_term = request.GET.get('search[value]')  # Arama terimini alın
 
     # Tüm emlakları sıralama ve arama terimine göre filtreleme
-    estates = RealEstate.objects.filter(estate_renter__isnull=False).order_by("-created_date")
+    estates = RealEstate.objects.filter(estate_renter__isnull=False, estate_status=estate_status).order_by("-created_date")
 
     if search_term:
         # Eğer bir arama terimi varsa, sorguyu oluşturun
@@ -306,7 +320,8 @@ def non_rental_estate_list_ajax(request):
     return JsonResponse(response)
 
 
-def rental_estate_list_ajax(request):
+def estates_on_rent_list_ajax(request):
+    estate_status = get_object_or_404(EstateStatus, estate_status="Kiralık")
     # DataTables'ın çizim numarasını alın
     draw = int(request.GET.get('draw', 1))
     start = int(request.GET.get('start', 0))  # Başlangıç indeksi
@@ -315,7 +330,7 @@ def rental_estate_list_ajax(request):
     search_term = request.GET.get('search[value]')  # Arama terimini alın
 
     # Tüm emlakları sıralama ve arama terimine göre filtreleme
-    estates = RealEstate.objects.filter(estate_renter=None).order_by("-created_date")
+    estates = RealEstate.objects.filter(estate_renter=None, estate_status=estate_status).order_by("-created_date")
 
     if search_term:
         # Eğer bir arama terimi varsa, sorguyu oluşturun
@@ -350,6 +365,102 @@ def rental_estate_list_ajax(request):
         'data': data,
     }
     return JsonResponse(response)
+
+
+def estates_on_sold_list_ajax(request):
+    estate_status = get_object_or_404(EstateStatus, estate_status="Satılık")
+    # DataTables'ın çizim numarasını alın
+    draw = int(request.GET.get('draw', 1))
+    start = int(request.GET.get('start', 0))  # Başlangıç indeksi
+    # Sayfa başına gösterilecek öğe sayısı
+    length = int(request.GET.get('length', 25))
+    search_term = request.GET.get('search[value]')  # Arama terimini alın
+
+    # Tüm emlakları sıralama ve arama terimine göre filtreleme
+    estates = RealEstate.objects.filter(estate_renter__isnull=False, estate_status=estate_status).order_by("-created_date")
+
+    if search_term:
+        # Eğer bir arama terimi varsa, sorguyu oluşturun
+        query = Q(title__icontains=search_term) | Q(city__city_name__icontains=search_term) | Q(county__county_name__icontains=search_term) | Q(
+            region__region_name__icontains=search_term) | Q(room_count__room_count__icontains=search_term)
+        estates = estates.filter(query)
+
+    total_records = estates.count()
+
+    # Sayfalama işlemini yapın
+    paginator = Paginator(estates, length)
+    # Start değerine göre doğru sayfayı alın
+    page = paginator.page(start // length + 1)
+
+    data = []
+    for estate in page:
+        image = Image.objects.filter(real_estate=estate.pk).first()
+        data.append({
+            "pk": estate.pk,
+            "image": image.image.url,
+            "title": estate.title,
+            "city": estate.city.city_name,
+            "county": estate.county.county_name,
+            "region": estate.region.region_name,
+            "room_count": estate.room_count.room_count,
+        })
+
+    response = {
+        'draw': draw,
+        'recordsTotal': total_records,
+        'recordsFiltered': total_records,
+        'data': data,
+    }
+    return JsonResponse(response)
+
+
+def estates_on_sale_list_ajax(request):
+    estate_status = get_object_or_404(EstateStatus, estate_status="Satılık")
+    # DataTables'ın çizim numarasını alın
+    draw = int(request.GET.get('draw', 1))
+    start = int(request.GET.get('start', 0))  # Başlangıç indeksi
+    # Sayfa başına gösterilecek öğe sayısı
+    length = int(request.GET.get('length', 25))
+    search_term = request.GET.get('search[value]')  # Arama terimini alın
+
+    # Tüm emlakları sıralama ve arama terimine göre filtreleme
+    estates = RealEstate.objects.filter(estate_renter=None, estate_status=estate_status).order_by("-created_date")
+
+    if search_term:
+        # Eğer bir arama terimi varsa, sorguyu oluşturun
+        query = Q(title__icontains=search_term) | Q(city__city_name__icontains=search_term) | Q(county__county_name__icontains=search_term) | Q(
+            region__region_name__icontains=search_term) | Q(room_count__room_count__icontains=search_term)
+        estates = estates.filter(query)
+
+    total_records = estates.count()
+
+    # Sayfalama işlemini yapın
+    paginator = Paginator(estates, length)
+    # Start değerine göre doğru sayfayı alın
+    page = paginator.page(start // length + 1)
+
+    data = []
+    for estate in page:
+        image = Image.objects.filter(real_estate=estate.pk).first()
+        data.append({
+            "pk": estate.pk,
+            "image": image.image.url,
+            "title": estate.title,
+            "city": estate.city.city_name,
+            "county": estate.county.county_name,
+            "region": estate.region.region_name,
+            "room_count": estate.room_count.room_count,
+        })
+
+    response = {
+        'draw': draw,
+        'recordsTotal': total_records,
+        'recordsFiltered': total_records,
+        'data': data,
+    }
+    return JsonResponse(response)
+
+
 
 
 def get_county_by_city_id(request, city_id):

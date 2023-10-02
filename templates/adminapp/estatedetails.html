@@ -26,10 +26,10 @@
                                 </h2>
                             </div>
                             <div class="col-md-6 text-right">
-                                {% if not estate.estate_renter %}
                                 {% if estate_s|lower == "kiralık" %}
-                                <a href="{% url 'renter_create' pk=estate.pk %}" class="btn btn-success">Kiracı Ekle</a>
-                                {% endif %}
+                                    {% if not estate.estate_renter %}
+                                    <a href="{% url 'renter_create' pk=estate.pk %}" class="btn btn-success">Kiracı Ekle</a>
+                                    {% endif %}
                                 {% elif estate_s|lower == "satılık" %}
                                 <a href="" class="btn btn-success">Alıcı Ekle</a>
                                 {% endif %}

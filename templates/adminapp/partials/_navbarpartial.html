@@ -25,6 +25,18 @@
             <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
                 <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülkler</span></a>
             </li>
+            <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
+                <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Kiralık Mülkler</span></a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
+                <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Satılık Mülkler</span></a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
+                <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Kiralanan Mülkler</span></a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
+                <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Satılan Mülkler</span></a>
+            </li>
             <li class="{% if request.resolver_match.url_name == 'owners' %}active{% endif %}">
                 <a href="{% url 'owners' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülk Sahipleri</span></a>
             </li>
