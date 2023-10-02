@@ -1,5 +1,3 @@
-from ast import mod
-from pyexpat import model
 from django.db import models
 from django.utils.text import slugify
 
@@ -9,13 +7,11 @@ class City(models.Model): # il
     def __str__(self):
         return self.city_name
 
-
 class County(models.Model): # ilçe
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
     county_name = models.CharField(max_length=30)
     def __str__(self):
         return self.county_name
-
 
 class Region(models.Model): # semt
     county = models.ForeignKey(County, on_delete=models.SET_NULL, null=True, blank=True)
@@ -57,8 +53,16 @@ class EstateOwner(models.Model):
     address = models.CharField(max_length=150, null=True, blank=True)
 
 
+class EstateRenter(models.Model):
+    name_surname = models.CharField(max_length=200)
+    identity_number = models.CharField(max_length=11, null=True, blank=True)
+    phone = models.CharField(max_length=11, null=True, blank=True)
+    address = models.CharField(max_length=150, null=True, blank=True)
+
+
 class RealEstate(models.Model):
     estate_owner = models.ForeignKey(EstateOwner, on_delete=models.CASCADE, null=True, blank=True)
+    estate_renter = models.ForeignKey(EstateRenter, on_delete=models.CASCADE, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
     county = models.ForeignKey(County, on_delete=models.SET_NULL, null=True, blank=True)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
@@ -95,14 +99,6 @@ class RealEstate(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
-
-
-class EstateRenter(models.Model):
-    real_estate = models.ForeignKey(RealEstate, on_delete=models.CASCADE, null=True, blank=True)
-    name_surname = models.CharField(max_length=200)
-    identity_number = models.CharField(max_length=11, null=True, blank=True)
-    phone = models.CharField(max_length=11, null=True, blank=True)
-    address = models.CharField(max_length=150, null=True, blank=True)
 
 
 class Contrat(models.Model):
