@@ -45,13 +45,11 @@ class RoomCount(models.Model):
     def __str__(self):
         return self.room_count
 
-
 class EstateOwner(models.Model):
     name_surname = models.CharField(max_length=200)
     identity_number = models.CharField(max_length=11, null=True, blank=True)
     phone = models.CharField(max_length=11, null=True, blank=True)
     address = models.CharField(max_length=150, null=True, blank=True)
-
 
 class EstateRenter(models.Model):
     name_surname = models.CharField(max_length=200)
@@ -64,6 +62,7 @@ class EstateBuyer(models.Model):
     identity_number = models.CharField(max_length=11, null=True, blank=True)
     phone = models.CharField(max_length=11, null=True, blank=True)
     address = models.CharField(max_length=150, null=True, blank=True)
+
 
 class RealEstate(models.Model):
     estate_owner = models.ForeignKey(EstateOwner, on_delete=models.SET_NULL, null=True, blank=True)
