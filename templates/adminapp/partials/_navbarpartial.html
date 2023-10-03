@@ -40,6 +40,9 @@
             <li class="{% if request.resolver_match.url_name == 'owners' %}active{% endif %}">
                 <a href="{% url 'owners' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülk Sahipleri</span></a>
             </li>
+            <li class="{% if request.resolver_match.url_name == 'buyers' %}active{% endif %}">
+                <a href="{% url 'buyers' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülk Alanlar</span></a>
+            </li>
             <li class="{% if request.resolver_match.url_name == 'renters' %}active{% endif %}">
                 <a href="{% url 'renters' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Kiracılar</span></a>
             </li>

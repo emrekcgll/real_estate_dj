@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from adminapp.forms import EstateOwnerForm, EstateRenterForm, RealEstateForm
-from adminapp.models import County, EstateOwner, EstateRenter, EstateStatus, Image, RealEstate, Region
+from adminapp.forms import EstateBuyerForm, EstateOwnerForm, EstateRenterForm, RealEstateForm
+from adminapp.models import County, EstateBuyer, EstateOwner, EstateRenter, EstateStatus, Image, RealEstate, Region
 from django.core.paginator import Paginator
 from django.db.models import Q
 import os
@@ -10,21 +10,37 @@ from django.db import transaction
 
 
 def index(request):
-    return render(request, 'adminapp/index.html')
+    satilik = get_object_or_404(EstateStatus, estate_status="Satılık")
+    kiralik = get_object_or_404(EstateStatus, estate_status="Kiralık")
+
+    estates_on_sale = RealEstate.objects.filter(
+        estate_status=satilik, estate_buyer=None).count()
+    estates_on_sold = RealEstate.objects.exclude(estate_buyer=None).count()
+    estates_on_rent = RealEstate.objects.filter(
+        estate_status=kiralik, estate_renter=None).count()
+    estates_on_rented = RealEstate.objects.exclude(estate_renter=None).count()
+
+    context = {"estates_on_sale": estates_on_sale, "estates_on_sold": estates_on_sold,
+               "estates_on_rent": estates_on_rent, "estates_on_rented": estates_on_rented}
+    return render(request, 'adminapp/index.html', context)
 
 
 # ESTATE OPERATIONS
 def estates(request):
     return render(request, "adminapp/estates.html")
 
+
 def estates_on_sale(request):
     return render(request, "adminapp/estates_on_sale.html")
 
-def estates_on_sold(request): 
+
+def estates_on_sold(request):
     return render(request, "adminapp/estates_on_sold.html")
 
-def estates_on_rent(request): 
+
+def estates_on_rent(request):
     return render(request, "adminapp/estates_on_rent.html")
+
 
 def estates_on_rented(request):
     return render(request, "adminapp/estates_on_rented.html")
@@ -36,7 +52,7 @@ def estate_details(request, pk):
     images = Image.objects.filter(real_estate=estate)
     return render(request, "adminapp/estatedetails.html", {"estate": estate,
                                                            "images": images,
-                                                           "estate_s": estate_s,})
+                                                           "estate_s": estate_s, })
 
 
 @transaction.atomic
@@ -201,7 +217,7 @@ def renter_create(request, pk):
             identity_number=identity_number,
             phone=phone, address=address)
         estate_renter.save()
-        estate.estate_renter = estate_renter 
+        estate.estate_renter = estate_renter
         estate.save()
         return redirect("estate_details", pk=estate.pk)
     return render(request, "adminapp/rentercreate.html")
@@ -227,6 +243,59 @@ def renter_delete(request, pk):
     renter = get_object_or_404(EstateRenter, pk=pk)
     renter.delete()
     return redirect("renters")
+
+
+# BUYER OPERATIONS
+def buyers(request):
+    buyers = EstateBuyer.objects.all()
+    return render(request, "adminapp/buyers.html", {"buyers": buyers})
+
+
+def buyer_details(request, pk):
+    buyer = get_object_or_404(EstateBuyer, pk=pk)
+    estates_by_buyer = RealEstate.objects.filter(estate_buyer=buyer).only("pk", "city__city_name", "county__county_name", "region__region_name", "room_count__room_count", "address", "title")\
+        .select_related("city", "county", "region", "room_count").first()
+    return render(request, "adminapp/buyerdetails.html", {"buyer": buyer, "estates_by_buyer": estates_by_buyer})
+
+
+def buyer_create(request, pk):
+    estate = get_object_or_404(RealEstate, pk=pk)
+    if request.method == "POST":
+        name_surname = request.POST.get("name_surname")
+        phone = request.POST.get("phone")
+        address = request.POST.get("address")
+        identity_number = request.POST.get("identity_number")
+        estate_buyer = EstateBuyer(
+            name_surname=name_surname,
+            identity_number=identity_number,
+            phone=phone, address=address)
+        estate_buyer.save()
+        estate.estate_buyer = estate_buyer
+        estate.save()
+        return redirect("estate_details", pk=estate.pk)
+    return render(request, "adminapp/buyercreate.html")
+
+
+def buyer_update(request, pk):
+    estate_pk = request.GET.get("estate_pk")
+    estate_buyer = get_object_or_404(EstateBuyer, pk=pk)
+    if request.method == "POST":
+        form = EstateBuyerForm(request.POST, instance=estate_buyer)
+        if form.is_valid():
+            form.save()
+            if estate_pk:
+                return redirect("estate_details", pk=estate_pk)
+            else:
+                return redirect("buyers")
+    else:
+        form = EstateBuyerForm(instance=estate_buyer)
+    return render(request, "adminapp/buyerupdate.html", {"form": form})
+
+
+def buyer_delete(request, pk):
+    buyer = get_object_or_404(EstateBuyer, pk=pk)
+    buyer.delete()
+    return redirect("buyers")
 
 
 # AJAX OPERATIONS
@@ -286,7 +355,8 @@ def estates_on_rented_list_ajax(request):
     search_term = request.GET.get('search[value]')  # Arama terimini alın
 
     # Tüm emlakları sıralama ve arama terimine göre filtreleme
-    estates = RealEstate.objects.filter(estate_renter__isnull=False, estate_status=estate_status).order_by("-created_date")
+    estates = RealEstate.objects.filter(
+        estate_renter__isnull=False, estate_status=estate_status).order_by("-created_date")
 
     if search_term:
         # Eğer bir arama terimi varsa, sorguyu oluşturun
@@ -333,7 +403,8 @@ def estates_on_rent_list_ajax(request):
     search_term = request.GET.get('search[value]')  # Arama terimini alın
 
     # Tüm emlakları sıralama ve arama terimine göre filtreleme
-    estates = RealEstate.objects.filter(estate_renter=None, estate_status=estate_status).order_by("-created_date")
+    estates = RealEstate.objects.filter(
+        estate_renter=None, estate_status=estate_status).order_by("-created_date")
 
     if search_term:
         # Eğer bir arama terimi varsa, sorguyu oluşturun
@@ -380,7 +451,8 @@ def estates_on_sold_list_ajax(request):
     search_term = request.GET.get('search[value]')  # Arama terimini alın
 
     # Tüm emlakları sıralama ve arama terimine göre filtreleme
-    estates = RealEstate.objects.filter(estate_renter__isnull=False, estate_status=estate_status).order_by("-created_date")
+    estates = RealEstate.objects.filter(
+        estate_buyer__isnull=False, estate_status=estate_status).order_by("-created_date")
 
     if search_term:
         # Eğer bir arama terimi varsa, sorguyu oluşturun
@@ -427,7 +499,8 @@ def estates_on_sale_list_ajax(request):
     search_term = request.GET.get('search[value]')  # Arama terimini alın
 
     # Tüm emlakları sıralama ve arama terimine göre filtreleme
-    estates = RealEstate.objects.filter(estate_renter=None, estate_status=estate_status).order_by("-created_date")
+    estates = RealEstate.objects.filter(
+        estate_buyer=None, estate_status=estate_status).order_by("-created_date")
 
     if search_term:
         # Eğer bir arama terimi varsa, sorguyu oluşturun
@@ -462,8 +535,6 @@ def estates_on_sale_list_ajax(request):
         'data': data,
     }
     return JsonResponse(response)
-
-
 
 
 def get_county_by_city_id(request, city_id):

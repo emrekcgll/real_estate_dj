@@ -1,0 +1,20 @@
+{% extends 'adminapp/_layout.html' %}
+{% load static %}
+{% block content %}
+<div class="row mt-3">
+    {% for item in buyers %}
+    <div class="col-lg-3">
+        <div class="contact-box">
+            <a class="row" href="{% url 'buyer_details' pk=item.pk %}">
+                <div class="col-8">
+                    <h3><strong>{{item.name_surname}}</strong></h3>
+                    <h6>{{item.identity_number}}</h6>
+                    <p><i class="fa fa-map-marker"></i>{{item.address}}</p>
+                    <p><i class="fa fa-phone"></i> {{item.phone}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

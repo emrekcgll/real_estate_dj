@@ -1,5 +1,6 @@
 from django import forms
-from adminapp.models import EstateOwner, EstateRenter, RealEstate
+from adminapp.models import EstateBuyer, EstateOwner, EstateRenter, RealEstate
+
 
 
 class EstateOwnerForm(forms.ModelForm):
@@ -16,6 +17,17 @@ class EstateOwnerForm(forms.ModelForm):
 class EstateRenterForm(forms.ModelForm):
     class Meta:
         model = EstateRenter
+        fields = ("name_surname", "identity_number", "phone", "address")
+        labels = {"name_surname": "Ad Soyad", "identity_number": "TC", "phone": "Telefon", "address": "Adres" }
+        widgets = {"name_surname": forms.TextInput(attrs={"class": "form-control"}),
+                   "identity_number": forms.TextInput(attrs={"class": "form-control"}),
+                   "phone": forms.NumberInput(attrs={"class": "form-control"}),
+                   "address": forms.TextInput(attrs={"class": "form-control"})}
+
+
+class EstateBuyerForm(forms.ModelForm):
+    class Meta:
+        model = EstateBuyer
         fields = ("name_surname", "identity_number", "phone", "address")
         labels = {"name_surname": "Ad Soyad", "identity_number": "TC", "phone": "Telefon", "address": "Adres" }
         widgets = {"name_surname": forms.TextInput(attrs={"class": "form-control"}),

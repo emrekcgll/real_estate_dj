@@ -59,10 +59,16 @@ class EstateRenter(models.Model):
     phone = models.CharField(max_length=11, null=True, blank=True)
     address = models.CharField(max_length=150, null=True, blank=True)
 
+class EstateBuyer(models.Model):
+    name_surname = models.CharField(max_length=200)
+    identity_number = models.CharField(max_length=11, null=True, blank=True)
+    phone = models.CharField(max_length=11, null=True, blank=True)
+    address = models.CharField(max_length=150, null=True, blank=True)
 
 class RealEstate(models.Model):
     estate_owner = models.ForeignKey(EstateOwner, on_delete=models.SET_NULL, null=True, blank=True)
     estate_renter = models.ForeignKey(EstateRenter, on_delete=models.SET_NULL, null=True, blank=True)
+    estate_buyer = models.ForeignKey(EstateBuyer, on_delete=models.SET_NULL, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
     county = models.ForeignKey(County, on_delete=models.SET_NULL, null=True, blank=True)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
