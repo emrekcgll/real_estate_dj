@@ -17,7 +17,6 @@ def index(request):
 def estates(request):
     return render(request, "adminapp/estates.html")
 
-
 def estates_on_sale(request):
     return render(request, "adminapp/estates_on_sale.html")
 
@@ -139,7 +138,8 @@ def owners(request):
 
 def owner_details(request, pk):
     owner = get_object_or_404(EstateOwner, pk=pk)
-    return render(request, "adminapp/ownerdetails.html", {"owner": owner})
+    estates_by_owner = RealEstate.objects.filter(estate_owner=owner).values("pk","city","county","region","address","room_count","title").all()
+    return render(request, "adminapp/ownerdetails.html", {"owner": owner, "estates_by_owner": estates_by_owner})
 
 
 def owner_create(request):

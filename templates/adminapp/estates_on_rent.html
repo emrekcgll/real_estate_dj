@@ -8,7 +8,7 @@
     <div class="col-md-12">
         <div class="ibox">
             <div class="ibox-title">
-                <h5>Real Estate List</h5>
+                <h5>Kiralık Evler</h5>
             </div>
             <div class="ibox-content">
                 <div class="table-responsive">
@@ -43,7 +43,7 @@
             dom: '<"html5buttons"B>lTfgitp',
             buttons: [],
             ajax: {
-                url: '{% url "estate_list_ajax" %}',
+                url: '{% url "estates_on_rent_list_ajax" %}',
                 type: 'GET',
                 contentType: 'application/json',
                 data: function (data) {

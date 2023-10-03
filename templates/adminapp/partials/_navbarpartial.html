@@ -25,17 +25,17 @@
             <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
                 <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülkler</span></a>
             </li>
-            <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
-                <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Kiralık Mülkler</span></a>
+            <li class="{% if request.resolver_match.url_name == 'estates_on_rent' %}active{% endif %}">
+                <a href="{% url 'estates_on_rent' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Kiralık Mülkler</span></a>
             </li>
-            <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
-                <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Satılık Mülkler</span></a>
+            <li class="{% if request.resolver_match.url_name == 'estates_on_sale' %}active{% endif %}">
+                <a href="{% url 'estates_on_sale' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Satılık Mülkler</span></a>
             </li>
-            <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
-                <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Kiralanan Mülkler</span></a>
+            <li class="{% if request.resolver_match.url_name == 'estates_on_rented' %}active{% endif %}">
+                <a href="{% url 'estates_on_rented' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Kiralanan Mülkler</span></a>
             </li>
-            <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
-                <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Satılan Mülkler</span></a>
+            <li class="{% if request.resolver_match.url_name == 'estates_on_sold' %}active{% endif %}">
+                <a href="{% url 'estates_on_sold' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Satılan Mülkler</span></a>
             </li>
             <li class="{% if request.resolver_match.url_name == 'owners' %}active{% endif %}">
                 <a href="{% url 'owners' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülk Sahipleri</span></a>
