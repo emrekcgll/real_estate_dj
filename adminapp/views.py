@@ -138,7 +138,8 @@ def owners(request):
 
 def owner_details(request, pk):
     owner = get_object_or_404(EstateOwner, pk=pk)
-    estates_by_owner = RealEstate.objects.filter(estate_owner=owner).values("pk","city","county","region","address","room_count","title").all()
+    estates_by_owner = RealEstate.objects.filter(estate_owner=owner).only("pk", "city__city_name", "county__county_name", "region__region_name", "room_count__room_count", "address", "title")\
+                                                                    .select_related("city", "county", "region", "room_count").all()
     return render(request, "adminapp/ownerdetails.html", {"owner": owner, "estates_by_owner": estates_by_owner})
 
 
@@ -183,7 +184,9 @@ def renters(request):
 
 def renter_details(request, pk):
     renter = get_object_or_404(EstateRenter, pk=pk)
-    return render(request, "adminapp/renterdetails.html", {"renter": renter})
+    estates_by_renter = RealEstate.objects.filter(estate_renter=renter).only("pk", "city__city_name", "county__county_name", "region__region_name", "room_count__room_count", "address", "title")\
+                                                                       .select_related("city", "county", "region", "room_count").first()
+    return render(request, "adminapp/renterdetails.html", {"renter": renter, "estates_by_renter": estates_by_renter})
 
 
 def renter_create(request, pk):
