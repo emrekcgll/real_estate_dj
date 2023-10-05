@@ -29,6 +29,10 @@
                                 {% if estate_s|lower == "kiralık" %}
                                     {% if not estate.estate_renter %}
                                         <a href="{% url 'renter_create' pk=estate.pk %}" class="btn btn-success">Kiracı Ekle</a>
+                                    {% elif not estate.estate_rent_contrat %}
+                                        <a href="{% url 'estate_rent_contrat_create' pk=estate.pk %}" class="btn btn-success">Kira Kontratı Oluştur</a>
+                                    {% elif estate.estate_rent_contrat %}
+                                        <a href="" class="btn btn-success">Kira Kontratını Görüntüle</a>
                                     {% endif %}
                                 {% elif estate_s|lower == "satılık" %}
                                     {% if not estate.estate_buyer %}

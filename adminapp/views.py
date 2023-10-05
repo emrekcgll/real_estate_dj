@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from adminapp.forms import EstateBuyerForm, EstateOwnerForm, EstateRenterForm, RealEstateForm
+from adminapp.forms import EstateBuyerForm, EstateOwnerForm, EstateRentForm, EstateRenterForm, RealEstateForm
 from adminapp.models import County, EstateBuyer, EstateOwner, EstateRenter, EstateStatus, Image, RealEstate, Region
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -243,6 +243,19 @@ def renter_delete(request, pk):
     renter = get_object_or_404(EstateRenter, pk=pk)
     renter.delete()
     return redirect("renters")
+
+
+def estate_rent_contrat_create(request, pk):
+    estate = get_object_or_404(RealEstate, pk=pk)
+    if request.method == "POST":
+        form = EstateRentForm(request.POST)
+        if form.is_valid():
+            estate_rent_contrat = form.save()
+            estate.estate_rent_contrat = estate_rent_contrat
+            estate.save()
+            return redirect("estate_details", pk=estate.pk)
+    form = EstateRentForm()
+    return render(request, "adminapp/estate_rent_contrat.html", {"form":form})
 
 
 # BUYER OPERATIONS

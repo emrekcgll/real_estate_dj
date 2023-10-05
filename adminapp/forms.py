@@ -1,7 +1,33 @@
+from attr import field
 from django import forms
-from adminapp.models import EstateBuyer, EstateOwner, EstateRenter, RealEstate
+from adminapp.models import Contrat, EstateBuyer, EstateOwner, EstateRenter, RealEstate
 
 
+
+class EstateRentForm(forms.ModelForm):
+    class Meta:
+        model = Contrat
+        exclude = ["contract_start_date"]
+        fields = ("contract_start_date", "contract_duration", 
+                 "year_rental_price", "mounth_rental_price", 
+                 "rent_payment_method", "how_to_use_the_rented_property", 
+                 "status_of_the_rented_property", "fixtures_delivered_with_the_rental")
+        labels = {"contract_start_date": "Akdin Başlangıç Tarihi", 
+                  "contract_duration": "Akdin Başlangıç Süresi",
+                  "year_rental_price": "Yıllık Kira Bedeli",
+                  "mounth_rental_price": "Aylık Kira Bedeli",
+                  "rent_payment_method":"Kira Bedelinin Ödeme Şekli", 
+                  "how_to_use_the_rented_property": "Kiralananı Kullanım Şekli", 
+                  "status_of_the_rented_property":"Kiralananın Durumu", 
+                  "fixtures_delivered_with_the_rental": "Kiralananla Birlikte Teslim Edilen Demirbaşlar"}
+        widgets = {"contract_start_date": forms.DateInput(attrs={"class": "form-control"}),
+                   "contract_duration": forms.NumberInput(attrs={"class": "form-control", "placeholder":"Kira sözleşmesinin süresi"}),
+                   "year_rental_price": forms.NumberInput(attrs={"class": "form-control", "placeholder":"Yıllık kira bedeli"}),
+                   "mounth_rental_price": forms.NumberInput(attrs={"class": "form-control", "placeholder":"Aylık kira bedeli"}),
+                   "rent_payment_method": forms.TextInput(attrs={"class": "form-control", "placeholder": "Her ayın beşinci günü akşamına kadar peşin olarak"}),
+                   "how_to_use_the_rented_property": forms.TextInput(attrs={"class": "form-control", "placeholder":"Yalnızca mesken, (konut) olarak"}),
+                   "status_of_the_rented_property": forms.TextInput(attrs={"class": "form-control", "placeholder":"Sağlam, tam, kullanılmaya elverişli, boyalı"}),
+                   "fixtures_delivered_with_the_rental": forms.Textarea(attrs={"class": "form-control", "placeholder":".... marka kombi, doğalgaz sayaçları, kiralananın apartman kapısı ve daire kapısının ikişer adet anahtarı"})}
 
 class EstateOwnerForm(forms.ModelForm):
     class Meta:

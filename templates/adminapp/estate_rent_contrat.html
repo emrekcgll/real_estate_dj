@@ -1,0 +1,88 @@
+{% extends "adminapp/_layout.html" %}
+{% load static %}
+{% block content %}
+<div class="row mt-3">
+    <div class="col-lg-12">
+        <div class="ibox ">
+            <div class="ibox-title">
+                <h5>Kontrat Oluştur</h5>
+            </div>
+            <div class="ibox-content">
+                <form method="post">{% csrf_token %}
+                    <div class="form-group  row">
+                        <label class="col-sm-2 col-form-label">Kontrat Başlangıç Tarihi</label>
+                        <div class="col-sm-10">
+                            <input id="date_time" value="" class="form-control" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group  row">
+                        <label class="col-sm-2 col-form-label">{{form.contract_duration.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.contract_duration}}
+                            {{form.contract_duration.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row">
+                        <label class="col-sm-2 col-form-label">{{form.year_rental_price.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.year_rental_price}}
+                            {{form.year_rental_price.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row">
+                        <label class="col-sm-2 col-form-label">{{form.mounth_rental_price.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.mounth_rental_price}}
+                            {{form.mounth_rental_price.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row">
+                        <label class="col-sm-2 col-form-label">{{form.rent_payment_method.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.rent_payment_method}}
+                            {{form.rent_payment_method.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row">
+                        <label class="col-sm-2 col-form-label">{{form.how_to_use_the_rented_property.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.how_to_use_the_rented_property}}
+                            {{form.how_to_use_the_rented_property.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row">
+                        <label class="col-sm-2 col-form-label">{{form.status_of_the_rented_property.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.status_of_the_rented_property}}
+                            {{form.status_of_the_rented_property.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row">
+                        <label class="col-sm-2 col-form-label">{{form.fixtures_delivered_with_the_rental.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.fixtures_delivered_with_the_rental}}
+                            {{form.fixtures_delivered_with_the_rental.errors}}
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group row">
+                        <div class="col-sm-4 col-sm-offset-2">
+                            <a href="{% url 'index' %}" class="btn btn-white btn-sm" type="submit">Cancel</a>
+                            <button class="btn btn-primary btn-sm" type="submit">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        var now = new Date();
+        var formattedDate = now.toLocaleDateString(); // Sadece tarih
+        $("#date_time").val(formattedDate);
+    });
+</script>
+{% endblock %}
