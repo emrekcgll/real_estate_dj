@@ -1,13 +1,21 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from numpy import unicode_
-from adminapp.forms import EstateBuyerForm, EstateOwnerForm, EstateRentForm, EstateRenterForm, RealEstateForm
-from adminapp.models import Contrat, County, EstateBuyer, EstateOwner, EstateRenter, EstateStatus, Image, RealEstate, Region
 from django.core.paginator import Paginator
 from django.db.models import Q
-import os
 from django.conf import settings
 from django.db import transaction
+
+from adminapp.forms import EstateBuyerForm, EstateOwnerForm, EstateRentForm, EstateRenterForm, RealEstateForm
+from adminapp.models import County, EstateBuyer, EstateOwner, EstateRenter, EstateStatus, Image, RealEstate, Region
+
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+import os
 
 
 def index(request):
@@ -264,16 +272,6 @@ def estate_rent_contrat_create(request, pk):
     form = EstateRentForm()
     return render(request, "adminapp/estate_rent_contrat.html", {"form": form})
 
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-from reportlab.lib import colors
-from io import BytesIO
-from django.http import FileResponse
-from django.shortcuts import get_object_or_404
-from .models import RealEstate
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
 
 def estate_rent_contrat_pdf(request, pk):
     estate_rent_contrat = get_object_or_404(RealEstate, estate_rent_contrat=pk)
