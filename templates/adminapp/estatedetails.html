@@ -20,19 +20,22 @@
                         </h2>
                         <div class="m-t-md">
                             <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <h2 class="product-main-price">
                                     {{estate.price|intcomma}} ₺
                                 </h2>
                             </div>
-                            <div class="col-md-6 text-right">
+                            <div class="col-md-9 text-right">
                                 {% if estate_s|lower == "kiralık" %}
                                     {% if not estate.estate_renter %}
                                         <a href="{% url 'renter_create' pk=estate.pk %}" class="btn btn-success">Kiracı Ekle</a>
                                     {% elif not estate.estate_rent_contrat %}
                                         <a href="{% url 'estate_rent_contrat_create' pk=estate.pk %}" class="btn btn-success">Kira Kontratı Oluştur</a>
                                     {% elif estate.estate_rent_contrat %}
-                                        <a href="" class="btn btn-success">Kira Kontratını Görüntüle</a>
+                                        <a href="{% url 'estate_rent_contrat_details' pk=estate.estate_rent_contrat.pk %}" class="btn btn-success">Kira Kontratını Görüntüle</a>
+                                        <a href="{% url 'estate_rent_contrat_pdf' pk=estate.estate_rent_contrat.pk %}" class="btn btn-success">Kontratı PDF Olarak İndir</a>
+                                        <a href="{% url 'estate_rent_contrat_details' pk=estate.estate_rent_contrat.pk %}" class="btn btn-success">Kontratı Word Olarak İndir</a>
+                                        <a href="{% url 'estate_rent_contrat_details' pk=estate.estate_rent_contrat.pk %}" class="btn btn-success">Kontratı Yazdır</a>
                                     {% endif %}
                                 {% elif estate_s|lower == "satılık" %}
                                     {% if not estate.estate_buyer %}
@@ -47,7 +50,9 @@
                             <div class="col-md-6">
                                 <h4>Adres</h4>
                                 <div class="text-muted">
-                                    {{estate.address}}<br> {{estate.region}} / {{estate.county}} / {{estate.city}}
+                                    Daire No:{{estate.apartment_number}} Dış Kapı No:{{estate.exterior_door_number}}<br>
+                                    {{estate.address}}<br> 
+                                    {{estate.region}} / {{estate.county}} / {{estate.city}}
                                 </div><br>
                                 <table class="table table-bordred">
                                     <tr>

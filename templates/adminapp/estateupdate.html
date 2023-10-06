@@ -6,60 +6,13 @@
         <div class="col-lg-7">
             <div class="ibox ">
                 <div class="ibox-title">
-                    <h5>Create New Estate</h5>
+                    <h5>Update Estate</h5>
                 </div>
                 <div class="ibox-content">
                     <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.title.label}}</label>
                         <div class="col-sm-10">
                             {{form.title}}
                             {{form.title.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label
-                            class="col-sm-2 col-form-label">{{form.room_count.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.room_count}}
-                            {{form.room_count.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label
-                            class="col-sm-2 col-form-label">{{form.bathrooms_count.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.bathrooms_count}}
-                            {{form.bathrooms_count.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.m2_brut.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.m2_brut}}
-                            {{form.m2_brut.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.m2_net.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.m2_net}}
-                            {{form.m2_net.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label
-                            class="col-sm-2 col-form-label">{{form.building_years.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.building_years}}
-                            {{form.building_years.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label
-                            class="col-sm-2 col-form-label">{{form.building_floor.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.building_floor}}
-                            {{form.building_floor.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label
-                            class="col-sm-2 col-form-label">{{form.is_balcony.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.is_balcony}}
-                            {{form.is_balcony.errors}}
                         </div>
                     </div>
                     <div class="form-group  row"><label
@@ -76,43 +29,70 @@
                             {{form.estate_type.errors}}
                         </div>
                     </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.from_who.label}}</label>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.price.label}}</label>
                         <div class="col-sm-10">
-                            {{form.from_who}}
-                            {{form.from_who.errors}}
+                            {{form.price}}
+                            {{form.price.errors}}
                         </div>
                     </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.city.label}}</label>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.m2_brut.label}}</label>
                         <div class="col-sm-10">
-                            {{form.city}}
-                            {{form.city.errors}}
+                            {{form.m2_brut}}
+                            {{form.m2_brut.errors}}
                         </div>
                     </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">İlçe</label>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.m2_net.label}}</label>
                         <div class="col-sm-10">
-                            <select class="form-control" id="county" name="county">
-                            </select>
-                            {{form.county.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">Semt</label>
-                        <div class="col-sm-10">
-                            <select class="form-control" id="region" name="region">
-                            </select>
-                            {{form.region.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.address.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.address}}
-                            {{form.address.errors}}
+                            {{form.m2_net}}
+                            {{form.m2_net.errors}}
                         </div>
                     </div>
                     <div class="form-group  row"><label
-                            class="col-sm-2 col-form-label">{{form.using_status.label}}</label>
+                            class="col-sm-2 col-form-label">{{form.room_count.label}}</label>
                         <div class="col-sm-10">
-                            {{form.using_status}}
-                            {{form.using_status.errors}}
+                            {{form.room_count}}
+                            {{form.room_count.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label
+                            class="col-sm-2 col-form-label">{{form.building_years.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.building_years}}
+                            {{form.building_years.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label
+                            class="col-sm-2 col-form-label">{{form.location_floor.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.location_floor}}
+                            {{form.location_floor.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label
+                            class="col-sm-2 col-form-label">{{form.building_floor.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.building_floor}}
+                            {{form.building_floor.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.heating.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.heating}}
+                            {{form.heating.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label
+                            class="col-sm-2 col-form-label">{{form.bathrooms_count.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.bathrooms_count}}
+                            {{form.bathrooms_count.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label
+                            class="col-sm-2 col-form-label">{{form.is_balcony.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.is_balcony}}
+                            {{form.is_balcony.errors}}
                         </div>
                     </div>
                     <div class="form-group  row"><label
@@ -123,36 +103,10 @@
                         </div>
                     </div>
                     <div class="form-group  row"><label
-                            class="col-sm-2 col-form-label">{{form.deed_status.label}}</label>
+                            class="col-sm-2 col-form-label">{{form.using_status.label}}</label>
                         <div class="col-sm-10">
-                            {{form.deed_status}}
-                            {{form.deed_status.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label
-                            class="col-sm-2 col-form-label">{{form.is_available_for_loan.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.is_available_for_loan}}
-                            {{form.is_available_for_loan.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.change.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.change}}
-                            {{form.change.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.dues.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.dues}}
-                            {{form.dues.errors}}
-                        </div>
-                    </div>
-                    <div class="form-group  row"><label
-                            class="col-sm-2 col-form-label">{{form.description.label}}</label>
-                        <div class="col-sm-10">
-                            {{form.description}}
-                            {{form.description.errors}}
+                            {{form.using_status}}
+                            {{form.using_status.errors}}
                         </div>
                     </div>
                     <div class="form-group  row"><label
@@ -168,23 +122,79 @@
                             {{form.site_name.errors}}
                         </div>
                     </div>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.dues.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.dues}}
+                            {{form.dues.errors}}
+                        </div>
+                    </div>
                     <div class="form-group  row"><label
-                            class="col-sm-2 col-form-label">{{form.location_floor.label}}</label>
+                            class="col-sm-2 col-form-label">{{form.is_available_for_loan.label}}</label>
                         <div class="col-sm-10">
-                            {{form.location_floor}}
-                            {{form.location_floor.errors}}
+                            {{form.is_available_for_loan}}
+                            {{form.is_available_for_loan.errors}}
                         </div>
                     </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.heating.label}}</label>
+                    <div class="form-group  row"><label
+                            class="col-sm-2 col-form-label">{{form.deed_status.label}}</label>
                         <div class="col-sm-10">
-                            {{form.heating}}
-                            {{form.heating.errors}}
+                            {{form.deed_status}}
+                            {{form.deed_status.errors}}
                         </div>
                     </div>
-                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.price.label}}</label>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.from_who.label}}</label>
                         <div class="col-sm-10">
-                            {{form.price}}
-                            {{form.price.errors}}
+                            {{form.from_who}}
+                            {{form.from_who.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.change.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.change}}
+                            {{form.change.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.city.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.city}}
+                            {{form.city.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">İlçe</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="county" name="county">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">Semt</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="region" name="region">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.address.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.address}}
+                            {{form.address.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.exterior_door_number.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.exterior_door_number}}
+                            {{form.exterior_door_number.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">{{form.apartment_number.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.apartment_number}}
+                            {{form.apartment_number.errors}}
+                        </div>
+                    </div>
+                    <div class="form-group  row"><label
+                            class="col-sm-2 col-form-label">{{form.description.label}}</label>
+                        <div class="col-sm-10">
+                            {{form.description}}
+                            {{form.description.errors}}
                         </div>
                     </div>
 

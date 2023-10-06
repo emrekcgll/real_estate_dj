@@ -32,6 +32,8 @@ urlpatterns = [
     path("renter-delete/<int:pk>/", views.renter_delete, name="renter_delete"),
 
     path("estate-rent-contrat-create/<int:pk>/", views.estate_rent_contrat_create, name="estate_rent_contrat_create"),
+    path("estate-rent-contrat-details/<int:pk>/", views.estate_rent_contrat_details, name="estate_rent_contrat_details"),
+    path("estate_rent_contrat_pdf/<int:pk>/", views.estate_rent_contrat_pdf, name="estate_rent_contrat_pdf"),
 
     path("buyers/", views.buyers, name="buyers"),
     path("buyer/<int:pk>/", views.buyer_details, name="buyer_details"),

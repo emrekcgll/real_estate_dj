@@ -1,0 +1,85 @@
+{% extends "adminapp/_layout.html" %}
+{% load static %}
+{% block content %}
+<div class="row mt-3">
+    <div class="col-lg-12">
+        <div class="ibox ">
+            <div class="ibox-title">
+                <h5>Kira Kontratı</h5>
+            </div>
+            <div class="ibox-content">
+                <table class="table table-bordered">
+                        <tr>
+                            <th style="width: 25%;">Daire Numarası</th>
+                            <td>{{estate_rent_contrat.apartment_number}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Dış Kapı Numarası</th>
+                            <td>{{estate_rent_contrat.exterior_door_number}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Cadde/Sokağı</th>
+                            <td>{{estate_rent_contrat.address}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Mahallesi</th>
+                            <td>{{estate_rent_contrat.region}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Semt / İlçe / İl</th>
+                            <td>{{estate_rent_contrat.region}} / {{estate_rent_contrat.county}} / {{estate_rent_contrat.city}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Kiralananın Cinsi</th>
+                            <td>{{estate_rent_contrat.estate_status}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Kiralayanın Adı Soyadı</th>
+                            <td>{{estate_rent_contrat.estate_renter.name_surname}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Kiralayanın T.C. Kimlik No</th>
+                            <td>{{estate_rent_contrat.estate_renter.identity_number}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Kiralayanın Adresi</th>
+                            <td>{{estate_rent_contrat.estate_renter.address}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Kiranın Başlangıç Tarihi</th>
+                            <td>{{estate_rent_contrat.estate_rent_contrat.contract_start_date}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Kiranın Süresi</th>
+                            <td>{{estate_rent_contrat.estate_rent_contrat.contract_duration}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Aylık Kira Bedeli</th>
+                            <td>{{estate_rent_contrat.estate_rent_contrat.mounth_rental_price}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Yıllık Kira Bedeli</th>
+                            <td>{{estate_rent_contrat.estate_rent_contrat.year_rental_price}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Kira Bedelinin Ödeme Şekli</th>
+                            <td>{{estate_rent_contrat.estate_rent_contrat.rent_payment_method}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Kiralananın Kullanım Şekli</th>
+                            <td>{{estate_rent_contrat.estate_rent_contrat.how_to_use_the_rented_property}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Kiralananın Durumu</th>
+                            <td>{{estate_rent_contrat.estate_rent_contrat.status_of_the_rented_property}}</td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Kiralananla Birlikte Teslim Edilen Demirbaşlar</th>
+                            <td>{{estate_rent_contrat.estate_rent_contrat.fixtures_delivered_with_the_rental}}</td>
+                        </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

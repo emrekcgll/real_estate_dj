@@ -87,6 +87,8 @@ class RealEstate(models.Model):
     from_who = models.ForeignKey(FromWho, on_delete=models.SET_NULL, null=True, blank=True) 
     room_count = models.ForeignKey(RoomCount, on_delete=models.SET_NULL, null=True, blank=True)
 
+    apartment_number = models.CharField(max_length=10) # daire numarası
+    exterior_door_number = models.CharField(max_length=10) # dış kapı numarası
     address = models.CharField(max_length=1000)
     title = models.CharField(max_length=100)
     price = models.PositiveIntegerField()

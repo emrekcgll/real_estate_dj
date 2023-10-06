@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Contrat</title>
+    <link href="{% static 'adminapp/email_templates/styles.css' %}" media="all" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <table class="body-wrap">
+        <tr>
+            <td></td>
+            <td class="container" width="600">
+                <div class="content">
+                    <table class="main" width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="content-wrap aligncenter">
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td class="content-block">
+                                            <h2>KİRA SÖZLEŞMESİ</h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <table class="table table-bordered">
+                                            <tr>
+                                                <th style="width: 25%;">Daire Numarası</th>
+                                                <td>{{estate_rent_contrat.apartment_number}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Dış Kapı Numarası</th>
+                                                <td>{{estate_rent_contrat.exterior_door_number}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Cadde/Sokağı</th>
+                                                <td>{{estate_rent_contrat.address}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Mahallesi</th>
+                                                <td>{{estate_rent_contrat.region}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Semt / İlçe / İl</th>
+                                                <td>{{estate_rent_contrat.region}} / {{estate_rent_contrat.county}} / {{estate_rent_contrat.city}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Kiralananın Cinsi</th>
+                                                <td>{{estate_rent_contrat.estate_status}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Kiralayanın Adı Soyadı</th>
+                                                <td>{{estate_rent_contrat.estate_renter.name_surname}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Kiralayanın T.C. Kimlik No</th>
+                                                <td>{{estate_rent_contrat.estate_renter.identity_number}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Kiralayanın Adresi</th>
+                                                <td>{{estate_rent_contrat.estate_renter.address}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Kiranın Başlangıç Tarihi</th>
+                                                <td>{{estate_rent_contrat.estate_rent_contrat.contract_start_date}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Kiranın Süresi</th>
+                                                <td>{{estate_rent_contrat.estate_rent_contrat.contract_duration}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Aylık Kira Bedeli</th>
+                                                <td>{{estate_rent_contrat.estate_rent_contrat.mounth_rental_price}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Yıllık Kira Bedeli</th>
+                                                <td>{{estate_rent_contrat.estate_rent_contrat.year_rental_price}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Kira Bedelinin Ödeme Şekli</th>
+                                                <td>{{estate_rent_contrat.estate_rent_contrat.rent_payment_method}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Kiralananı Kullanım Şekli</th>
+                                                <td>{{estate_rent_contrat.estate_rent_contrat.how_to_use_the_rented_property}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Kiralananın Durumu</th>
+                                                <td>{{estate_rent_contrat.estate_rent_contrat.status_of_the_rented_property}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 25%;">Kiralananla Birlikte Teslim Edilen Demirbaşlar</th>
+                                                <td>{{estate_rent_contrat.estate_rent_contrat.fixtures_delivered_with_the_rental}}</td>
+                                            </tr>
+                                    </table>
+                                    </tr>
+                                    <tr>
+                                        <td class="content-block">
+                                            <a href="#">View in browser</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="content-block">
+                                            Company Inc. 123 Van Ness, San Francisco 94102
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="footer">
+                        <table width="100%">
+                            <tr>
+                                <td class="aligncenter content-block">Questions? Email <a href="mailto:">support@company.inc</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+</body>
+</html>
