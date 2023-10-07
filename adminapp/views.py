@@ -10,23 +10,23 @@ from adminapp.models import County, EstateBuyer, EstateOwner, EstateRenter, Esta
 
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, PageBreak, Spacer
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.units import inch
 import os
+import json
 
 
 def index(request):
     satilik = get_object_or_404(EstateStatus, estate_status="Satılık")
     kiralik = get_object_or_404(EstateStatus, estate_status="Kiralık")
 
-    estates_on_sale = RealEstate.objects.filter(
-        estate_status=satilik, estate_buyer=None).count()
+    estates_on_sale = RealEstate.objects.filter(estate_status=satilik, estate_buyer=None).count()
     estates_on_sold = RealEstate.objects.exclude(estate_buyer=None).count()
-    estates_on_rent = RealEstate.objects.filter(
-        estate_status=kiralik, estate_renter=None).count()
+    estates_on_rent = RealEstate.objects.filter(estate_status=kiralik, estate_renter=None).count()
     estates_on_rented = RealEstate.objects.exclude(estate_renter=None).count()
 
     context = {"estates_on_sale": estates_on_sale, "estates_on_sold": estates_on_sold,
@@ -61,7 +61,7 @@ def estate_details(request, pk):
     images = Image.objects.filter(real_estate=estate)
     return render(request, "adminapp/estatedetails.html", {"estate": estate,
                                                            "images": images,
-                                                           "estate_s": estate_s, })
+                                                           "estate_s": estate_s})
 
 
 @transaction.atomic
@@ -78,10 +78,8 @@ def estate_create(request):
                 identity_number = request.POST.get("identity_number")
 
                 if name_surname != "":
-                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={
-                                                                              "name_surname": name_surname, "phone": phone, "address": address, "identity_number": identity_number})
-                    estate_owner_instance = get_object_or_404(
-                        EstateOwner, pk=estate_owner.pk)
+                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={"name_surname": name_surname, "phone": phone, "address": address, "identity_number": identity_number})
+                    estate_owner_instance = get_object_or_404(EstateOwner, pk=estate_owner.pk)
                     data.estate_owner = estate_owner_instance
 
                 county_id = request.POST.get("county")
@@ -276,59 +274,52 @@ def estate_rent_contrat_create(request, pk):
 def estate_rent_contrat_pdf(request, pk):
     estate_rent_contrat = get_object_or_404(RealEstate, estate_rent_contrat=pk)
     pdfmetrics.registerFont(TTFont('ArialUnicode', 'static/arialuni.ttf'))
-
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, encoding='utf-8')
     para_style = ParagraphStyle(name="Normal", wordWrap=True, fontName='ArialUnicode')
+    para_style2 = ParagraphStyle(name="Normal", wordWrap=True, fontName='ArialUnicode')
+    # para_style2 = ParagraphStyle(name="Normal", wordWrap=True, fontName='ArialUnicode', fontSize=12, leading=15)
+
+    styles = getSampleStyleSheet()
+    header_style = styles['Title']
+    header_style.alignment = 1
+    header_style.fontName = 'ArialUnicode'
+    header_style.fontSize = 24
+    header_style.spaceAfter = 20
+    header_style.spaceBefore = 40
+    header_text = Paragraph("KİRA SÖZLEŞMESİ", header_style)
 
     daire_no = Paragraph("Daire Numarasi", para_style)
     daire_no_text = Paragraph(estate_rent_contrat.apartment_number, para_style)
-
     diskapi_no = Paragraph("Dış Kapı Numarası", para_style)
     diskapi_no_text = Paragraph(estate_rent_contrat.exterior_door_number, para_style)
-
     cadde_sokak = Paragraph("Cadde / Sokak", para_style)
     cadde_sokak_text = Paragraph(estate_rent_contrat.address, para_style)
-
     mahalle = Paragraph("Daire Numarasi", para_style)
     mahalle_text = Paragraph(estate_rent_contrat.region.region_name, para_style)
-
     semt_il_ilce = Paragraph("Semt / İl / İlce", para_style)
     semt_il_ilce_text = Paragraph(f"{estate_rent_contrat.region.region_name} / {estate_rent_contrat.county.county_name} / {estate_rent_contrat.city.city_name}", para_style)
-
     kiralanan_cinsi = Paragraph("Kiralananın Cinsi", para_style)
     kiralanan_cinsi_text = Paragraph(estate_rent_contrat.estate_type.estate_type, para_style)
-
     kiralayan_ad_soyad = Paragraph("Kiralayanın Adı Soyadı", para_style)
     kiralayan_ad_soyad_text = Paragraph(estate_rent_contrat.estate_renter.name_surname, para_style)
-
     kiralayan_tc = Paragraph("Kiralayanın T.C. Kimlik No", para_style)
     kiralayan_tc_text = Paragraph(estate_rent_contrat.estate_renter.identity_number, para_style)
-
     kiralayan_adres = Paragraph("Kiralayanın Adresi", para_style)
     kiralayan_adres_text = Paragraph(estate_rent_contrat.estate_renter.address, para_style)
-
     kiranin_baslangic_tarihi = Paragraph("Kiranın Başlangıç Tarihi", para_style)
     kiranin_baslangic_tarihi_text = estate_rent_contrat.estate_rent_contrat.contract_start_date
-
     kiranin_suresi = Paragraph("Kiranın Süresi", para_style)
     kiranin_suresi_text = estate_rent_contrat.estate_rent_contrat.contract_duration
-
     aylik_kira_bedeli = Paragraph("Aylık Kira Bedeli", para_style)
     aylik_kira_bedeli_text = estate_rent_contrat.estate_rent_contrat.mounth_rental_price
-
     yillik_kira_bedeli = Paragraph("Yıllık Kira Bedeli", para_style)
     yillik_kira_bedeli_text = estate_rent_contrat.estate_rent_contrat.year_rental_price
-
     kira_bedelini_ödeme_sekli = Paragraph("Kira Bedelinin Ödeme Şekli", para_style)
     kira_bedelini_ödeme_sekli_text = Paragraph(estate_rent_contrat.estate_rent_contrat.rent_payment_method, para_style)
-
     kiralanani_kullanim_durumu = Paragraph("Kiralananı Kullanım Şekli", para_style)
     kiralanani_kullanim_durumu_text = Paragraph(estate_rent_contrat.estate_rent_contrat.how_to_use_the_rented_property, para_style)
-
     kiralananin_durumu = Paragraph("Kiralananın Durumu", para_style)
     kiralananin_durumu_text = Paragraph(estate_rent_contrat.estate_rent_contrat.status_of_the_rented_property, para_style)
-
     demirbaslar = Paragraph("Kiralananla Birlikte Teslim Edilen Demirbaşlar", para_style)
     demirbaslar_text = Paragraph(estate_rent_contrat.estate_rent_contrat.fixtures_delivered_with_the_rental, para_style)
 
@@ -351,24 +342,44 @@ def estate_rent_contrat_pdf(request, pk):
         [kiralananin_durumu, kiralananin_durumu_text],
         [demirbaslar, demirbaslar_text]
     ]
-    
-    # Tabloyu oluşturun
+    imza = [["Kiraya Veren", "Kefil", "Kiralayan"]]
+    table_imza = Table(imza, colWidths=[170, 170, 170])
+    table_imza_style = TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                                   ('ALIGN', (0, 0), (-1, -1), 'CENTER')])
+    table_imza.setStyle(table_imza_style)
+
+    genel_kosullar_text = Paragraph("GENEL KOŞULLAR", header_style)
+    with open('static/genel_kosullar.json', 'r', encoding='utf-8') as f:
+        genel_kosullar = json.load(f)
+    genel_kosullar = genel_kosullar["genel_kosullar"]
+
+    data2 = []
+    for item in genel_kosullar:
+        text = Paragraph(item, para_style2)
+        data2.append([text])
+
     table = Table(data, colWidths=[150, 350])
-    style = TableStyle([('GRID', (0, 0), (-1, -1), 0.1, colors.black), ('VALIGN', (0, 0), (-1, -1), 'TOP')])
+    table2 = Table(data2, colWidths=[500])
+
+    style = TableStyle([('GRID', (0, 0), (-1, -1), 0.1, colors.black), 
+                        ('VALIGN', (0, 0), (-1, -1), 'TOP')])
+    style2 = TableStyle([('GRID', (0, 0), (-1, -1), 0.1, colors.black), 
+                         ('VALIGN', (0, 0), (-1, -1), 'TOP')])
 
     table.setStyle(style)
+    table2.setStyle(style2)
 
-    # Ana başlık eklemek için bir metin paragrafı oluşturun
-    styles = getSampleStyleSheet()
-    header_style = styles['Title']
-    header_style.alignment = 1
-    header_style.fontName = 'ArialUnicode'
-    header_style.fontSize = 24
-    header_style.spaceAfter = 20
-    header_text = Paragraph("Kira Sözleşmesi", header_style)
-    
-    elements = [header_text, table]
+    elements_page1 = [header_text, table, Spacer(1, 3.32*inch), table_imza]
+    elements_page2 = [genel_kosullar_text, table2, Spacer(1, 0.92*inch), table_imza]
+
+    doc = SimpleDocTemplate(buffer, pagesize=letter, encoding='utf-8')
+    elements = []
+    elements.extend(elements_page1)
+    elements.append(PageBreak())
+    elements.extend(elements_page2)
+
     doc.build(elements)
+
     buffer.seek(0)
     response = FileResponse(buffer, as_attachment=True, filename='veri.pdf', content_type='application/pdf; charset=utf-8')
     return response
