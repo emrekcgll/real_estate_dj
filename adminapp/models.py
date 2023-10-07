@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from django.contrib.auth import get_user_model
 
 
 class City(models.Model): # il
@@ -74,6 +75,7 @@ class Contrat(models.Model):
     status_of_the_rented_property = models.CharField(max_length=200)
     fixtures_delivered_with_the_rental = models.CharField(max_length=200)
 
+
 class RealEstate(models.Model):
     estate_owner = models.ForeignKey(EstateOwner, on_delete=models.SET_NULL, null=True, blank=True)
     estate_renter = models.ForeignKey(EstateRenter, on_delete=models.SET_NULL, null=True, blank=True)
@@ -117,6 +119,12 @@ class RealEstate(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+
+class RealEstateAgentCommission(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True)
+    estate = models.ForeignKey(RealEstate, on_delete=models.SET_NULL, null=True, blank=True)
+    comission = models.PositiveIntegerField()
 
 
 class Image(models.Model):

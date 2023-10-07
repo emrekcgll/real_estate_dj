@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import transaction
 
 from adminapp.forms import EstateBuyerForm, EstateOwnerForm, EstateRentForm, EstateRenterForm, RealEstateForm
-from adminapp.models import County, EstateBuyer, EstateOwner, EstateRenter, EstateStatus, Image, RealEstate, Region
+from adminapp.models import County, EstateBuyer, EstateOwner, EstateRenter, EstateStatus, Image, RealEstate, RealEstateAgentCommission, Region
 
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
@@ -24,9 +24,11 @@ def index(request):
     satilik = get_object_or_404(EstateStatus, estate_status="Satılık")
     kiralik = get_object_or_404(EstateStatus, estate_status="Kiralık")
 
-    estates_on_sale = RealEstate.objects.filter(estate_status=satilik, estate_buyer=None).count()
+    estates_on_sale = RealEstate.objects.filter(
+        estate_status=satilik, estate_buyer=None).count()
     estates_on_sold = RealEstate.objects.exclude(estate_buyer=None).count()
-    estates_on_rent = RealEstate.objects.filter(estate_status=kiralik, estate_renter=None).count()
+    estates_on_rent = RealEstate.objects.filter(
+        estate_status=kiralik, estate_renter=None).count()
     estates_on_rented = RealEstate.objects.exclude(estate_renter=None).count()
 
     context = {"estates_on_sale": estates_on_sale, "estates_on_sold": estates_on_sold,
@@ -78,8 +80,10 @@ def estate_create(request):
                 identity_number = request.POST.get("identity_number")
 
                 if name_surname != "":
-                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={"name_surname": name_surname, "phone": phone, "address": address, "identity_number": identity_number})
-                    estate_owner_instance = get_object_or_404(EstateOwner, pk=estate_owner.pk)
+                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={
+                                                                              "name_surname": name_surname, "phone": phone, "address": address, "identity_number": identity_number})
+                    estate_owner_instance = get_object_or_404(
+                        EstateOwner, pk=estate_owner.pk)
                     data.estate_owner = estate_owner_instance
 
                 county_id = request.POST.get("county")
@@ -258,25 +262,39 @@ def estate_rent_contrat_details(request, pk):
     return render(request, "adminapp/estate_rent_contrat_details.html", {"estate_rent_contrat": estate_rent_contrat})
 
 
+@transaction.atomic
 def estate_rent_contrat_create(request, pk):
-    estate = get_object_or_404(RealEstate, pk=pk)
-    if request.method == "POST":
-        form = EstateRentForm(request.POST)
-        if form.is_valid():
-            estate_rent_contrat = form.save()
-            estate.estate_rent_contrat = estate_rent_contrat
-            estate.save()
-            return redirect("estate_details", pk=estate.pk)
-    form = EstateRentForm()
-    return render(request, "adminapp/estate_rent_contrat.html", {"form": form})
+    try:
+        estate = get_object_or_404(RealEstate, pk=pk)
+        if request.method == "POST":
+            form = EstateRentForm(request.POST)
+            if form.is_valid():
+                estate_rent_contrat = form.save(commit=False)
+                estate_rent_contrat.save()
+
+                estate.estate_rent_contrat = estate_rent_contrat
+                estate.save()
+
+                comission = request.POST.get("comission")
+                RealEstateAgentCommission.objects.create(
+                    user=request.user, estate=estate, comission=comission)
+
+                return redirect("estate_details", pk=estate.pk)
+        form = EstateRentForm()
+        return render(request, "adminapp/estate_rent_contrat.html", {"form": form})
+    except Exception as e:
+        transaction.set_rollback(True)
+        print(f"Hata: {e}")
 
 
 def estate_rent_contrat_pdf(request, pk):
     estate_rent_contrat = get_object_or_404(RealEstate, estate_rent_contrat=pk)
     pdfmetrics.registerFont(TTFont('ArialUnicode', 'static/arialuni.ttf'))
     buffer = BytesIO()
-    para_style = ParagraphStyle(name="Normal", wordWrap=True, fontName='ArialUnicode')
-    para_style2 = ParagraphStyle(name="Normal", wordWrap=True, fontName='ArialUnicode')
+    para_style = ParagraphStyle(
+        name="Normal", wordWrap=True, fontName='ArialUnicode')
+    para_style2 = ParagraphStyle(
+        name="Normal", wordWrap=True, fontName='ArialUnicode')
     # para_style2 = ParagraphStyle(name="Normal", wordWrap=True, fontName='ArialUnicode', fontSize=12, leading=15)
 
     styles = getSampleStyleSheet()
@@ -291,22 +309,30 @@ def estate_rent_contrat_pdf(request, pk):
     daire_no = Paragraph("Daire Numarasi", para_style)
     daire_no_text = Paragraph(estate_rent_contrat.apartment_number, para_style)
     diskapi_no = Paragraph("Dış Kapı Numarası", para_style)
-    diskapi_no_text = Paragraph(estate_rent_contrat.exterior_door_number, para_style)
+    diskapi_no_text = Paragraph(
+        estate_rent_contrat.exterior_door_number, para_style)
     cadde_sokak = Paragraph("Cadde / Sokak", para_style)
     cadde_sokak_text = Paragraph(estate_rent_contrat.address, para_style)
     mahalle = Paragraph("Daire Numarasi", para_style)
-    mahalle_text = Paragraph(estate_rent_contrat.region.region_name, para_style)
+    mahalle_text = Paragraph(
+        estate_rent_contrat.region.region_name, para_style)
     semt_il_ilce = Paragraph("Semt / İl / İlce", para_style)
-    semt_il_ilce_text = Paragraph(f"{estate_rent_contrat.region.region_name} / {estate_rent_contrat.county.county_name} / {estate_rent_contrat.city.city_name}", para_style)
+    semt_il_ilce_text = Paragraph(
+        f"{estate_rent_contrat.region.region_name} / {estate_rent_contrat.county.county_name} / {estate_rent_contrat.city.city_name}", para_style)
     kiralanan_cinsi = Paragraph("Kiralananın Cinsi", para_style)
-    kiralanan_cinsi_text = Paragraph(estate_rent_contrat.estate_type.estate_type, para_style)
+    kiralanan_cinsi_text = Paragraph(
+        estate_rent_contrat.estate_type.estate_type, para_style)
     kiralayan_ad_soyad = Paragraph("Kiralayanın Adı Soyadı", para_style)
-    kiralayan_ad_soyad_text = Paragraph(estate_rent_contrat.estate_renter.name_surname, para_style)
+    kiralayan_ad_soyad_text = Paragraph(
+        estate_rent_contrat.estate_renter.name_surname, para_style)
     kiralayan_tc = Paragraph("Kiralayanın T.C. Kimlik No", para_style)
-    kiralayan_tc_text = Paragraph(estate_rent_contrat.estate_renter.identity_number, para_style)
+    kiralayan_tc_text = Paragraph(
+        estate_rent_contrat.estate_renter.identity_number, para_style)
     kiralayan_adres = Paragraph("Kiralayanın Adresi", para_style)
-    kiralayan_adres_text = Paragraph(estate_rent_contrat.estate_renter.address, para_style)
-    kiranin_baslangic_tarihi = Paragraph("Kiranın Başlangıç Tarihi", para_style)
+    kiralayan_adres_text = Paragraph(
+        estate_rent_contrat.estate_renter.address, para_style)
+    kiranin_baslangic_tarihi = Paragraph(
+        "Kiranın Başlangıç Tarihi", para_style)
     kiranin_baslangic_tarihi_text = estate_rent_contrat.estate_rent_contrat.contract_start_date
     kiranin_suresi = Paragraph("Kiranın Süresi", para_style)
     kiranin_suresi_text = estate_rent_contrat.estate_rent_contrat.contract_duration
@@ -314,14 +340,21 @@ def estate_rent_contrat_pdf(request, pk):
     aylik_kira_bedeli_text = estate_rent_contrat.estate_rent_contrat.mounth_rental_price
     yillik_kira_bedeli = Paragraph("Yıllık Kira Bedeli", para_style)
     yillik_kira_bedeli_text = estate_rent_contrat.estate_rent_contrat.year_rental_price
-    kira_bedelini_ödeme_sekli = Paragraph("Kira Bedelinin Ödeme Şekli", para_style)
-    kira_bedelini_ödeme_sekli_text = Paragraph(estate_rent_contrat.estate_rent_contrat.rent_payment_method, para_style)
-    kiralanani_kullanim_durumu = Paragraph("Kiralananı Kullanım Şekli", para_style)
-    kiralanani_kullanim_durumu_text = Paragraph(estate_rent_contrat.estate_rent_contrat.how_to_use_the_rented_property, para_style)
+    kira_bedelini_ödeme_sekli = Paragraph(
+        "Kira Bedelinin Ödeme Şekli", para_style)
+    kira_bedelini_ödeme_sekli_text = Paragraph(
+        estate_rent_contrat.estate_rent_contrat.rent_payment_method, para_style)
+    kiralanani_kullanim_durumu = Paragraph(
+        "Kiralananı Kullanım Şekli", para_style)
+    kiralanani_kullanim_durumu_text = Paragraph(
+        estate_rent_contrat.estate_rent_contrat.how_to_use_the_rented_property, para_style)
     kiralananin_durumu = Paragraph("Kiralananın Durumu", para_style)
-    kiralananin_durumu_text = Paragraph(estate_rent_contrat.estate_rent_contrat.status_of_the_rented_property, para_style)
-    demirbaslar = Paragraph("Kiralananla Birlikte Teslim Edilen Demirbaşlar", para_style)
-    demirbaslar_text = Paragraph(estate_rent_contrat.estate_rent_contrat.fixtures_delivered_with_the_rental, para_style)
+    kiralananin_durumu_text = Paragraph(
+        estate_rent_contrat.estate_rent_contrat.status_of_the_rented_property, para_style)
+    demirbaslar = Paragraph(
+        "Kiralananla Birlikte Teslim Edilen Demirbaşlar", para_style)
+    demirbaslar_text = Paragraph(
+        estate_rent_contrat.estate_rent_contrat.fixtures_delivered_with_the_rental, para_style)
 
     data = [
         [daire_no, daire_no_text],
@@ -361,16 +394,17 @@ def estate_rent_contrat_pdf(request, pk):
     table = Table(data, colWidths=[150, 350])
     table2 = Table(data2, colWidths=[500])
 
-    style = TableStyle([('GRID', (0, 0), (-1, -1), 0.1, colors.black), 
+    style = TableStyle([('GRID', (0, 0), (-1, -1), 0.1, colors.black),
                         ('VALIGN', (0, 0), (-1, -1), 'TOP')])
-    style2 = TableStyle([('GRID', (0, 0), (-1, -1), 0.1, colors.black), 
+    style2 = TableStyle([('GRID', (0, 0), (-1, -1), 0.1, colors.black),
                          ('VALIGN', (0, 0), (-1, -1), 'TOP')])
 
     table.setStyle(style)
     table2.setStyle(style2)
 
     elements_page1 = [header_text, table, Spacer(1, 3.32*inch), table_imza]
-    elements_page2 = [genel_kosullar_text, table2, Spacer(1, 0.92*inch), table_imza]
+    elements_page2 = [genel_kosullar_text,
+                      table2, Spacer(1, 0.92*inch), table_imza]
 
     doc = SimpleDocTemplate(buffer, pagesize=letter, encoding='utf-8')
     elements = []
@@ -381,7 +415,8 @@ def estate_rent_contrat_pdf(request, pk):
     doc.build(elements)
 
     buffer.seek(0)
-    response = FileResponse(buffer, as_attachment=True, filename='veri.pdf', content_type='application/pdf; charset=utf-8')
+    response = FileResponse(buffer, as_attachment=True, filename='kira-kontratı().pdf',
+                            content_type='application/pdf; charset=utf-8')
     return response
 
 

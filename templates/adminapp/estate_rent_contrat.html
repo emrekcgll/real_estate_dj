@@ -1,14 +1,14 @@
 {% extends "adminapp/_layout.html" %}
 {% load static %}
 {% block content %}
-<div class="row mt-3">
-    <div class="col-lg-12">
-        <div class="ibox ">
-            <div class="ibox-title">
-                <h5>Kontrat Oluştur</h5>
-            </div>
-            <div class="ibox-content">
-                <form method="post">{% csrf_token %}
+<form method="post">{% csrf_token %}
+    <div class="row mt-3">
+        <div class="col-lg-9">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>Kontrat Oluştur</h5>
+                </div>
+                <div class="ibox-content">
                     <div class="form-group  row">
                         <label class="col-sm-2 col-form-label">Kontrat Başlangıç Tarihi</label>
                         <div class="col-sm-10">
@@ -71,11 +71,25 @@
                             <button class="btn btn-primary btn-sm" type="submit">Save</button>
                         </div>
                     </div>
-                </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>Alınan Komisyon Miktarı</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="form-group  row"><label class="col-sm-2 col-form-label">Komisyon</label>
+                        <div class="col-sm-10">
+                            <input type="number" name="comission" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
 {% endblock %}
 {% block script %}
 <script>

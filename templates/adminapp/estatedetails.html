@@ -33,9 +33,7 @@
                                         <a href="{% url 'estate_rent_contrat_create' pk=estate.pk %}" class="btn btn-success">Kira Kontratı Oluştur</a>
                                     {% elif estate.estate_rent_contrat %}
                                         <a href="{% url 'estate_rent_contrat_details' pk=estate.estate_rent_contrat.pk %}" class="btn btn-success">Kira Kontratını Görüntüle</a>
-                                        <a href="{% url 'estate_rent_contrat_pdf' pk=estate.estate_rent_contrat.pk %}" class="btn btn-success">Kontratı PDF Olarak İndir</a>
-                                        <a href="{% url 'estate_rent_contrat_details' pk=estate.estate_rent_contrat.pk %}" class="btn btn-success">Kontratı Word Olarak İndir</a>
-                                        <a href="{% url 'estate_rent_contrat_details' pk=estate.estate_rent_contrat.pk %}" class="btn btn-success">Kontratı Yazdır</a>
+                                        <a href="{% url 'estate_rent_contrat_pdf' pk=estate.estate_rent_contrat.pk %}" class="btn btn-success">Kira Kontratını İndir</a>
                                     {% endif %}
                                 {% elif estate_s|lower == "satılık" %}
                                     {% if not estate.estate_buyer %}
