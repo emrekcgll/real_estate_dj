@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import transaction
 
 from adminapp.forms import EstateBuyerForm, EstateOwnerForm, EstateRentForm, EstateRenterForm, RealEstateForm
-from adminapp.models import County, EstateBuyer, EstateOwner, EstateRenter, EstateStatus, Image, RealEstate, RealEstateAgentCommission, Region
+from adminapp.models import Contrat, County, EstateBuyer, EstateOwner, EstateRenter, EstateStatus, Image, RealEstate, RealEstateAgentCommission, Region
 
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
@@ -103,10 +103,8 @@ def estate_create(request):
 
                 return redirect("estates")
             except Exception as e:
-                # Herhangi bir hata durumunda işlemi geri al
                 transaction.set_rollback(True)
                 print(f"Hata: {e}")
-                return redirect("estates")
     else:
         form = RealEstateForm()
 
@@ -127,7 +125,6 @@ def estate_delete(request, pk):
     except Exception as e:
         transaction.set_rollback(True)
         print(f"Hata: {e}")
-        return redirect("estates")
 
 
 def estate_update(request, pk):
@@ -257,9 +254,15 @@ def renter_delete(request, pk):
 
 
 # CONTRAT OPERATIONS
+def estate_rent_contrats(request):
+    contrat = RealEstate.objects.all()
+    return render(request, "adminapp/estate_rent_contrats.html")
+
+
 def estate_rent_contrat_details(request, pk):
-    estate_rent_contrat = get_object_or_404(RealEstate, estate_rent_contrat=pk)
-    return render(request, "adminapp/estate_rent_contrat_details.html", {"estate_rent_contrat": estate_rent_contrat})
+    estate_rent_contrat = get_object_or_404(RealEstate, estate_rent_contrat=pk) 
+    return render(request, "adminapp/estate_rent_contrat_details.html", 
+                  {"estate_rent_contrat": estate_rent_contrat,})
 
 
 @transaction.atomic
@@ -281,10 +284,22 @@ def estate_rent_contrat_create(request, pk):
 
                 return redirect("estate_details", pk=estate.pk)
         form = EstateRentForm()
-        return render(request, "adminapp/estate_rent_contrat.html", {"form": form})
+        return render(request, "adminapp/estate_rent_contrat_create.html", {"form": form})
     except Exception as e:
         transaction.set_rollback(True)
         print(f"Hata: {e}")
+
+
+def estate_rent_contrat_update(request, pk):
+    estate_rent_contrat = get_object_or_404(Contrat, pk=pk)
+    if request.method == "POST":
+        form = EstateRentForm(request.POST, instance=estate_rent_contrat)
+        if form.is_valid():
+            form.save()
+            return redirect("estate_rent_contrats")
+    else:
+        form = EstateRentForm(instance=estate_rent_contrat)
+    return render(request, "adminapp/estate_rent_contrat_update.html", {"form": form})
 
 
 def estate_rent_contrat_pdf(request, pk):
@@ -418,6 +433,12 @@ def estate_rent_contrat_pdf(request, pk):
     response = FileResponse(buffer, as_attachment=True, filename='kira-kontratı().pdf',
                             content_type='application/pdf; charset=utf-8')
     return response
+
+
+def estate_rent_contrat_delete(request, pk):
+    estate_rent_contrat = get_object_or_404(Contrat, pk=pk)
+    estate_rent_contrat.delete()
+    return redirect("estate_rent_contrats")
 
 
 # BUYER OPERATIONS

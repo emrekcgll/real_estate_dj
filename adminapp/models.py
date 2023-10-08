@@ -125,6 +125,7 @@ class RealEstateAgentCommission(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True)
     estate = models.ForeignKey(RealEstate, on_delete=models.SET_NULL, null=True, blank=True)
     comission = models.PositiveIntegerField()
+    created_date = models.DateTimeField(auto_now_add=True)
 
 
 class Image(models.Model):
