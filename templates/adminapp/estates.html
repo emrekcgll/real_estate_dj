@@ -1,31 +1,95 @@
 {% extends "adminapp/_layout.html" %}
 {% load static %}
+{% load humanize %}
 {% block content %}
 <div class="row mt-3">
     <div class="col-md-12 mb-3">
-        <a href="{% url 'estate_create' %}" class="btn btn-primary">Add New Estate</a>
+        <a href="{% url 'estate_create' %}" class="btn btn-primary">Yeni İlan Oluştur</a>
     </div>
     <div class="col-md-12">
         <div class="ibox">
             <div class="ibox-title">
-                <h5>Real Estate List</h5>
+                <h5>Emlak Listesi</h5>
             </div>
             <div class="ibox-content">
+                {% if data %}
                 <div class="table-responsive">
-                    <table id="data-table" class="table table-striped table-bordered table-hover" style="width:100%">
+                    <form id="filter_form">
+                        <label>Göster</label>
+                        <select name="view" id="view">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                        </select>
+
+                        <label>Sırala</label>
+                        <select name="sort" id="sort">
+                            <option value="new-to-old">Yeniden Eskiye</option>
+                            <option value="old-to-new">Eskiden Yeniye</option>
+                        </select>
+
+                        <label>Filtre</label>
+                        <select name="status" id="status">
+                            <option value="all">Tümünü Göster</option>
+                            <option value="for-sale">Satılık</option>
+                            <option value="for-rent">Kiralık</option>
+                        </select>
+                    </form>
+                    <table class="table table-hover" style="width:100%">
                         <thead>
                             <tr>
-                                <th style="width:1px;">Image</th>
-                                <th>Title</th>
-                                <th>City</th>
-                                <th>County</th>
-                                <th>Region</th>
-                                <th>Room Count</th>
-                                <th style="width:1px;"></th>
+                                <th style="width:1%;"></th>
+                                <th>Başlık</th>
+                                <th>İl / İlçe / Mahalle</th>
+                                <th>Oda Sayısı</th>
+                                <th>Durumu</th>
+                                <th>Fiyat</th>
                             </tr>
                         </thead>
+                        <tbody>
+                            {% for item in data %}
+                            <a href="{% url 'estate_details' pk=item.pk %}">
+                                <tr onclick="window.location='{% url 'estate_details' pk=item.pk %}';"
+                                    style="cursor: pointer;" style="align-items:center;">
+                                    <td><img width="200" src="{{item.image.image.url}}"></td>
+                                    <td>{{item.title}}</td>
+                                    <td>{{item.city}} / {{item.county}} / {{item.region}}</td>
+                                    <td>{{item.room_count}}</td>
+                                    <td>
+                                        {% if item.estate_rent_contrat %}
+                                        Kiralandı (Kontrat Mevcut)
+                                        {% elif item.estate_renter %}
+                                        Kiralandı
+                                        {% else %}
+                                        {{item.estate_status}}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{item.price|intcomma}} ₺</td>
+                                </tr>
+                            </a>
+                            {% endfor %}
+                        </tbody>
                     </table>
+                    <div class="text-center">
+                        <div class="btn-group">
+                            {% if data.has_previous %}
+                            <a class="btn btn-white" href=""><i class="fa fa-chevron-left"></i></a>
+                            {% endif %}
+
+                            {% for page_num in page_range %}
+                            <a class="btn btn-white {% if page_num == data.number %}active{% endif %}" 
+                            href="?page={{page_num}}{% if view %}&view={{view}}{% endif %}{% if sort %}&sort={{sort}}{% endif %}{% if status %}&status={{status}}{% endif %}">{{page_num}}</a>
+                            {% endfor %}
+
+                            {% if data.has_next %}
+                            <a class="btn btn-white" type="button"><i class="fa fa-chevron-right"></i></a>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
+                {% else %}
+                <h4 class="text-danger">Henüz hiç mülk kaydedilmemiş.</h4>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -34,43 +98,28 @@
 {% block script %}
 <script>
     $(document).ready(function () {
-        $('#data-table').DataTable({
-            lengthMenu: [10, 15, 20,25],
-            serverSide: true,
-            processing: true,
-            responsive: true,
-            ordering: false,
-            dom: '<"html5buttons"B>lTfgitp',
-            buttons: [],
-            ajax: {
-                url: '{% url "estate_list_ajax" %}',
-                type: 'GET',
-                contentType: 'application/json',
-                data: function (data) {
-                    return data;
-                },
-                dataSrc: 'data',
-            },
-            columns: [
-                {
-                    data: 'image',
-                    render: function(data){
-                        return `<img width="200px" src="${data}">`
-                    }
-                },
-                { data: 'title' },
-                { data: 'city' },
-                { data: 'county' },
-                { data: 'region' },
-                { data: 'room_count' },
-                {
-                    data: 'pk',
-                    render: function(data){
-                        return `<a href="/web/estate/${data}/" class="btn btn-success">View</a>`
-                    }
-                },
-            ]
+        $("#view, #sort, #status").change(function () {
+            $("#filter_form").submit();
         });
+        var queryString = window.location.search;
+        var params = new URLSearchParams(queryString);
+        var view = params.get("view");
+        var sort = params.get("sort");
+        var status = params.get("status");
+
+        if (view === "" || view === null || view === undefined || (view !== "10" && view !== "20" && view !== "30")) {
+            view = 10;
+        }
+        if (sort === "" || sort === null || sort == undefined || (sort !== "new-to-old" && sort !== "old-to-new")) {
+            sort = "new-to-old";
+        }
+        if (status === "" || status === null || status == undefined || (status !== "for-rent" && status !== "for-sale")) {
+            status = "all"
+        }
+
+        $("#view").val(view);
+        $("#sort").val(sort);
+        $("#status").val(status);
     });
 </script>
 {% endblock %}

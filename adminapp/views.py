@@ -1,7 +1,7 @@
 from django.http import JsonResponse, FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.core.paginator import Paginator
-from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q, F
 from django.conf import settings
 from django.db import transaction
 
@@ -24,11 +24,9 @@ def index(request):
     satilik = get_object_or_404(EstateStatus, estate_status="Satılık")
     kiralik = get_object_or_404(EstateStatus, estate_status="Kiralık")
 
-    estates_on_sale = RealEstate.objects.filter(
-        estate_status=satilik, estate_buyer=None).count()
+    estates_on_sale = RealEstate.objects.filter(estate_status=satilik, estate_buyer=None).count()
     estates_on_sold = RealEstate.objects.exclude(estate_buyer=None).count()
-    estates_on_rent = RealEstate.objects.filter(
-        estate_status=kiralik, estate_renter=None).count()
+    estates_on_rent = RealEstate.objects.filter(estate_status=kiralik, estate_renter=None).count()
     estates_on_rented = RealEstate.objects.exclude(estate_renter=None).count()
 
     context = {"estates_on_sale": estates_on_sale, "estates_on_sold": estates_on_sold,
@@ -38,7 +36,68 @@ def index(request):
 
 # ESTATE OPERATIONS
 def estates(request):
-    return render(request, "adminapp/estates.html")
+    # Görüntüleme sayısı
+    view = int(request.GET.get("view", 1))
+    view = min(max(view, 10), 1)  # Min 10, max 30 yap
+
+    # Veritabanı sorgusu
+    estates = RealEstate.objects.select_related('city', 'county', 'region', 'room_count', 'estate_status').prefetch_related('image_set')
+
+    # Durum filtresi
+    status = request.GET.get("status")
+    if status == "for-sale":
+        estates = estates.filter(estate_status__estate_status="Satılık")
+    elif status == "for-rent":
+        estates = estates.filter(estate_status__estate_status="Kiralık")
+
+    # Sıralama
+    sort = request.GET.get("sort")
+    if sort == "old-to-new":
+        estates = estates.order_by("pk")
+    else:
+        estates = estates.order_by("-pk")
+
+    estates = estates.all()
+    paginator = Paginator(estates, view)
+    page = request.GET.get("page")
+
+    try:
+        data = paginator.page(page)
+        page_range = paginator.page_range[max(0, data.number - 2): data.number + 3]
+    except PageNotAnInteger:
+        data = paginator.page(1)
+        page_range = paginator.page_range[:5]
+    except EmptyPage:
+        data = paginator.page(paginator.num_pages)
+        page_range = paginator.page_range[-5:]
+
+    data = [
+        {
+            "pk": item.pk,
+            "title": item.title,
+            "city": item.city.city_name,
+            "county": item.county.county_name,
+            "region": item.region.region_name,
+            "room_count": item.room_count.room_count,
+            "estate_status": item.estate_status.estate_status,
+            "price": item.price,
+            "image": item.image_set.first(),
+        }
+        for item in data
+    ]
+
+    total_estate = paginator.count
+    items_per_page = len(data)
+    context = {
+        "data": data,
+        "page_range": page_range,
+        "view": view,
+        "sort": sort,
+        "status": status,
+        "total_estate": total_estate,
+        "items_per_page": items_per_page,
+    }
+    return render(request, "adminapp/estates.html", context)
 
 
 def estates_on_sale(request):
@@ -120,6 +179,7 @@ def estate_delete(request, pk):
         for image in images:
             os.remove(os.path.join(settings.MEDIA_ROOT, image.image.name))
         images.delete()
+
         real_estate.delete()
         return redirect("estates")
     except Exception as e:
