@@ -20,19 +20,29 @@ class Region(models.Model): # semt
     def __str__(self):
         return self.region_name
 
-class Address(models.Model): # ev adresi
-    Region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
-    address = models.CharField(max_length=500)
-    def __str__(self):
-        return self.address
-
 class EstateType(models.Model):
-    estate_type = models.CharField(max_length=30, unique=True) # Daire, Villa, Residance 
+    DAIRE = 'Daire'
+    VILLA = 'Villa'
+    RESIDENCE = 'Residence'
+    MUSTAKIL_EV = 'Müstakil Ev'
+    ESTATE_TYPE_CHOICES = [
+        (DAIRE, 'Daire'),
+        (VILLA, 'Villa'),
+        (RESIDENCE, 'Residence'),
+        (MUSTAKIL_EV, 'Müstakil Ev'),
+    ]
+    estate_type = models.CharField(max_length=30, unique=True, choices=ESTATE_TYPE_CHOICES) # Daire, Villa, Residance 
     def __str__(self):
         return self.estate_type
 
 class EstateStatus(models.Model):
-    estate_status = models.CharField(max_length=30, unique=True) # Satılık, Kiralık 
+    KIRALIK = 'Kiralık'
+    SATILIK = 'Satılık'
+    ESTATE_STATUS_CHOICES = [
+        (KIRALIK, 'Kiralık'),
+        (SATILIK, 'Satılık'),
+    ]
+    estate_status = models.CharField(max_length=30, unique=True, choices=ESTATE_STATUS_CHOICES) # Satılık, Kiralık
     def __str__(self):
         return self.estate_status
 

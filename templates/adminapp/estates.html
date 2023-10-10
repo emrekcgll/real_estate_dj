@@ -15,25 +15,37 @@
                 {% if data %}
                 <div class="table-responsive">
                     <form id="filter_form">
-                        <label>Göster</label>
-                        <select name="view" id="view">
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="30">30</option>
-                        </select>
-
-                        <label>Sırala</label>
-                        <select name="sort" id="sort">
-                            <option value="new-to-old">Yeniden Eskiye</option>
-                            <option value="old-to-new">Eskiden Yeniye</option>
-                        </select>
-
-                        <label>Filtre</label>
-                        <select name="status" id="status">
-                            <option value="all">Tümünü Göster</option>
-                            <option value="for-sale">Satılık</option>
-                            <option value="for-rent">Kiralık</option>
-                        </select>
+                        <table class="table">
+                            <td>
+                                <label>Toplam ilan sayısı: {{total_estate}}</label>
+                            </td>
+                            <td>
+                                <label>Gösterilen ilan sayısı: {{items_per_page}}</label>
+                            </td>
+                            <td>
+                                <label>Göster</label>
+                                <select name="view" id="view">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                </select>
+                            </td>
+                            <td>
+                                <label>Sırala</label>
+                                <select name="sort" id="sort">
+                                    <option value="new-to-old">Yeniden Eskiye</option>
+                                    <option value="old-to-new">Eskiden Yeniye</option>
+                                </select>
+                            </td>
+                            <td>
+                                <label>Filtre</label>
+                                <select name="status" id="status">
+                                    <option value="all">Tümünü Göster</option>
+                                    <option value="for-sale">Satılık</option>
+                                    <option value="for-rent">Kiralık</option>
+                                </select>
+                            </td>
+                        </table>
                     </form>
                     <table class="table table-hover" style="width:100%">
                         <thead>
@@ -73,16 +85,22 @@
                     <div class="text-center">
                         <div class="btn-group">
                             {% if data.has_previous %}
-                            <a class="btn btn-white" href=""><i class="fa fa-chevron-left"></i></a>
+                            <a class="btn btn-white" type="button"
+                                href="?page={{data.previous_page_number}}{% if view %}&view={{view}}{% endif %}{% if sort %}&sort={{sort}}{% endif %}{% if status %}&status={{status}}{% endif %}">
+                                <i class="fa fa-chevron-left"></i>
+                            </a>
                             {% endif %}
 
                             {% for page_num in page_range %}
-                            <a class="btn btn-white {% if page_num == data.number %}active{% endif %}" 
-                            href="?page={{page_num}}{% if view %}&view={{view}}{% endif %}{% if sort %}&sort={{sort}}{% endif %}{% if status %}&status={{status}}{% endif %}">{{page_num}}</a>
+                            <a class="btn btn-white {% if page_num == data.number %} active {% endif %}" type="button"
+                                href="?page={{page_num}}{% if view %}&view={{view}}{% endif %}{% if sort %}&sort={{sort}}{% endif %}{% if status %}&status={{status}}{% endif %}">{{page_num}}</a>
                             {% endfor %}
 
                             {% if data.has_next %}
-                            <a class="btn btn-white" type="button"><i class="fa fa-chevron-right"></i></a>
+                            <a class="btn btn-white" type="button"
+                                href="?page={{data.next_page_number}}{% if view %}&view={{view}}{% endif %}{% if sort %}&sort={{sort}}{% endif %}{% if status %}&status={{status}}{% endif %}">
+                                <i class="fa fa-chevron-right"></i>
+                            </a>
                             {% endif %}
                         </div>
                     </div>
