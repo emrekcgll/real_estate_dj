@@ -47,12 +47,38 @@ class EstateStatus(models.Model):
         return self.estate_status
 
 class FromWho(models.Model):
-    from_who = models.CharField(max_length=30, unique=True) # kimden, emlakcıdan, sahibinden
+    EMLAKCIDAN = 'Emlakçıdan'
+    SAHIBINDEN = 'Sahibinden'
+    FROM_WHO_CHOICES = [
+        (EMLAKCIDAN, 'Emlakçıdan'),
+        (SAHIBINDEN, 'Sahibinden'),
+    ]
+    from_who = models.CharField(max_length=30, unique=True, choices=FROM_WHO_CHOICES) # kimden, emlakcıdan, sahibinden
     def __str__(self):
         return self.from_who
 
 class RoomCount(models.Model):
-    room_count = models.CharField(max_length=10, unique=True) # oda sayısı
+    bir_sifir = '1+0'
+    bir_bir = '1+1'
+    iki_bir = '2+1'
+    uc_bir = '3+1'
+    dort_bir = '4+1'
+    dort_iki = '4+2'
+    bes_bir = '5+1'
+    bes_iki = '5+2'
+    bes_uc = '5+3'
+    ROOM_COUNT_CHOICES = [
+        (bir_sifir, '1+0'),
+        (bir_bir, '1+1'),
+        (iki_bir, '2+1'),
+        (uc_bir, '3+1'),
+        (dort_bir, '4+1'),
+        (dort_iki, '4+2'),
+        (bes_bir, '5+1'),
+        (bes_iki, '5+2'),
+        (bes_uc, '5+3'),
+    ]
+    room_count = models.CharField(max_length=10, unique=True, choices=ROOM_COUNT_CHOICES) # oda sayısı
     def __str__(self):
         return self.room_count
 
