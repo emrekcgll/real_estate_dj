@@ -2,7 +2,6 @@ from django import forms
 from adminapp.models import Contrat, EstateBuyer, EstateOwner, EstateRenter, RealEstate
 
 
-
 class EstateRentForm(forms.ModelForm):
     class Meta:
         model = Contrat

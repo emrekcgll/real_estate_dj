@@ -139,8 +139,7 @@ def estate_create(request):
                 identity_number = request.POST.get("identity_number")
 
                 if name_surname != "":
-                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={
-                                                                              "name_surname": name_surname, "phone": phone, "address": address, "identity_number": identity_number})
+                    estate_owner, created = EstateOwner.objects.get_or_create(phone=phone, defaults={"name_surname": name_surname, "phone": phone, "address": address, "identity_number": identity_number})
                     estate_owner_instance = get_object_or_404(
                         EstateOwner, pk=estate_owner.pk)
                     data.estate_owner = estate_owner_instance
