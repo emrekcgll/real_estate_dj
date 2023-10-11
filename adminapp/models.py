@@ -21,49 +21,49 @@ class Region(models.Model): # semt
         return self.region_name
 
 class EstateType(models.Model):
-    class TypeChoices(models.TextChoices):
-        DAIRE = 'DAIRE', 'Daire'
-        VILLA = 'VILLA', 'Villa'
-        RESIDENCE = 'RESIDENCE', 'Residence'
-        MUSTAKIL_EV = 'MUSTAKIL_EV', 'Müstakil Ev'
+    # class TypeChoices(models.TextChoices):
+    #     DAIRE = 'DAIRE', 'Daire'
+    #     VILLA = 'VILLA', 'Villa'
+    #     RESIDENCE = 'RESIDENCE', 'Residence'
+    #     MUSTAKIL_EV = 'MUSTAKIL_EV', 'Müstakil Ev'
     
-    estate_type = models.CharField(max_length=30, unique=True, choices=TypeChoices.choices) # Daire, Villa, Residance 
+    estate_type = models.CharField(max_length=30, unique=True) # Daire, Villa, Residance 
     def __str__(self):
         return self.estate_type
 
 class EstateStatus(models.Model):
-    class StatusChoices(models.TextChoices):
-        SATILIK = 'SATILIK', 'Satılık'
-        KIRALIK = 'KIRALIK', 'Kiralık'
+    # class StatusChoices(models.TextChoices):
+    #     SATILIK = 'SATILIK', 'Satılık'
+    #     KIRALIK = 'KIRALIK', 'Kiralık'
 
-    estate_status = models.CharField(max_length=30, unique=True, choices=StatusChoices.choices) # Satılık, Kiralık
+    estate_status = models.CharField(max_length=30, unique=True) # Satılık, Kiralık
     def __str__(self):
         return self.estate_status
 
 class FromWho(models.Model):
-    class WhoChoices(models.TextChoices):
-        EMLAKCIDAN = 'EMLAKCIDAN', 'Emlakçıdan'
-        SAHIBINDEN = 'SAHIBINDEN', 'Sahibinden'
+    # class WhoChoices(models.TextChoices):
+    #     EMLAKCIDAN = 'EMLAKCIDAN', 'Emlakçıdan'
+    #     SAHIBINDEN = 'SAHIBINDEN', 'Sahibinden'
 
-    from_who = models.CharField(max_length=30, unique=True, choices=WhoChoices.choices) # kimden, emlakcıdan, sahibinden
+    from_who = models.CharField(max_length=30, unique=True) # kimden, emlakcıdan, sahibinden
     def __str__(self):
         return self.from_who
 
 class RoomCount(models.Model):
-    class RoomChoices(models.TextChoices):
-        BIR_SIFIR = '1+0', '1+0'
-        BIR_BIR   = '1+1', '1+1'
-        IKI_BIR   = '2+1', '2+1'
-        IKI_SIFIR = '2+0', '2+0'
-        UC_BIR    = '3+1', '3+1'
-        UC_IKI    = '3+2', '3+2'
-        UC_SIFIR  = '3+0', '3+0'
-        DORT_BIR  = '4+1', '4+1'
-        DORT_IKI  = '4+2', '4+2'
-        BES_BIR   = '5+1', '5+1'
-        BES_IKI   = '5+2', '5+2'
+    # class RoomChoices(models.TextChoices):
+    #     BIR_SIFIR = '1+0', '1+0'
+    #     BIR_BIR   = '1+1', '1+1'
+    #     IKI_BIR   = '2+1', '2+1'
+    #     IKI_SIFIR = '2+0', '2+0'
+    #     UC_BIR    = '3+1', '3+1'
+    #     UC_IKI    = '3+2', '3+2'
+    #     UC_SIFIR  = '3+0', '3+0'
+    #     DORT_BIR  = '4+1', '4+1'
+    #     DORT_IKI  = '4+2', '4+2'
+    #     BES_BIR   = '5+1', '5+1'
+    #     BES_IKI   = '5+2', '5+2'
 
-    room_count = models.CharField(max_length=10, unique=True, choices=RoomChoices.choices) # oda sayısı
+    room_count = models.CharField(max_length=10, unique=True) # oda sayısı
     def __str__(self):
         return self.room_count
 
@@ -105,10 +105,10 @@ class RealEstate(models.Model):
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
     county = models.ForeignKey(County, on_delete=models.SET_NULL, null=True, blank=True)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
-    estate_type = models.ForeignKey(EstateType, on_delete=models.SET_NULL, null=True, blank=True, choices=EstateType.TypeChoices.choices)
-    estate_status = models.ForeignKey(EstateStatus, on_delete=models.SET_NULL, null=True, blank=True, choices=EstateStatus.StatusChoices.choices)
-    from_who = models.ForeignKey(FromWho, on_delete=models.SET_NULL, null=True, blank=True, choices=FromWho.WhoChoices.choices) 
-    room_count = models.ForeignKey(RoomCount, on_delete=models.SET_NULL, null=True, blank=True, choices=RoomCount.RoomChoices.choices)
+    estate_type = models.ForeignKey(EstateType, on_delete=models.SET_NULL, null=True, blank=True)
+    estate_status = models.ForeignKey(EstateStatus, on_delete=models.SET_NULL, null=True, blank=True)
+    from_who = models.ForeignKey(FromWho, on_delete=models.SET_NULL, null=True, blank=True) 
+    room_count = models.ForeignKey(RoomCount, on_delete=models.SET_NULL, null=True, blank=True)
 
     apartment_number = models.CharField(max_length=10) # daire numarası
     exterior_door_number = models.CharField(max_length=10) # dış kapı numarası

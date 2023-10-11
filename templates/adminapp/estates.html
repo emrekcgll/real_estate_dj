@@ -2,116 +2,277 @@
 {% load static %}
 {% load humanize %}
 {% block content %}
-<div class="row mt-3">
-    <div class="col-md-12 mb-3">
-        <a href="{% url 'estate_create' %}" class="btn btn-primary">Yeni İlan Oluştur</a>
-    </div>
+<form class="mt-3" id="filter_form">
     <div class="col-md-12">
-        <div class="ibox">
-            <div class="ibox-title">
-                <h5>Emlak Listesi</h5>
+        <div class="ecommerce">
+            <a href="{% url 'estate_create' %}" class="btn btn-primary mb-3">Yeni İlan Oluştur</a>
+            <div class="ibox-content m-b-sm border-bottom">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="col-form-label" for="product_name">Toplam İlan Sayısı</label>
+                            <input id="product_name" name="product_name" value="{{total_estate}}" class="form-control"
+                                disabled>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="col-form-label" for="price">Görüntülenen İlan Sayısı</label>
+                            <input id="price" name="price" value="{{items_per_page}}" class="form-control" disabled>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="col-form-label" for="status">Göster</label>
+                            <select name="view" id="view" class="form-control">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="ibox-content">
-                {% if data %}
-                <div class="table-responsive">
-                    <form id="filter_form">
-                        <table class="table">
-                            <td>
-                                <label>Toplam ilan sayısı: {{total_estate}}</label>
-                            </td>
-                            <td>
-                                <label>Gösterilen ilan sayısı: {{items_per_page}}</label>
-                            </td>
-                            <td>
-                                <label>Göster</label>
-                                <select name="view" id="view">
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="30">30</option>
-                                </select>
-                            </td>
-                            <td>
-                                <label>Sırala</label>
-                                <select name="sort" id="sort">
-                                    <option value="new-to-old">Yeniden Eskiye</option>
-                                    <option value="old-to-new">Eskiden Yeniye</option>
-                                </select>
-                            </td>
-                            <td>
-                                <label>Filtre</label>
-                                <select name="status" id="status">
-                                    <option value="all">Tümünü Göster</option>
-                                    <option value="for-sale">Satılık</option>
-                                    <option value="for-rent">Kiralık</option>
-                                </select>
-                            </td>
-                        </table>
-                    </form>
-                    <table class="table table-hover" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th style="width:1%;"></th>
-                                <th>Başlık</th>
-                                <th>İl / İlçe / Mahalle</th>
-                                <th>Oda Sayısı</th>
-                                <th>Durumu</th>
-                                <th>Fiyat</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in data %}
-                            <a href="{% url 'estate_details' pk=item.pk %}">
-                                <tr onclick="window.location='{% url 'estate_details' pk=item.pk %}';"
-                                    style="cursor: pointer;" style="align-items:center;">
-                                    <td><img width="200" src="{{item.image.image.url}}"></td>
-                                    <td>{{item.title}}</td>
-                                    <td>{{item.city}} / {{item.county}} / {{item.region}}</td>
-                                    <td>{{item.room_count}}</td>
-                                    <td>
-                                        {% if item.estate_rent_contrat %}
-                                        Kiralandı (Kontrat Mevcut)
-                                        {% elif item.estate_renter %}
-                                        Kiralandı
-                                        {% else %}
-                                        {{item.estate_status}}
+            <div class="row">
+                <div class="col-lg-9">
+                    <div class="ibox">
+                        <div class="ibox-content">
+                            {% if data %}
+                            <div class="table-responsive">
+                                <table class="table table-hover" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:1%; " class="bilgiler-baslik">
+                                                <h3 style="font-weight: 600; font-size: 14px!important;  ">Görsel</h3>
+                                            </th>
+                                            <th class="bilgiler-baslik">
+                                                <h3 style="font-weight: 600; font-size: 14px!important;">Emlak Tipi</h3>
+                                            </th>
+                                            <th class="baslik-ilan">
+                                                <h3 style="font-weight: 600; font-size: 14px!important;">İlan Başlığı
+                                                </h3>
+                                            </th>
+                                            <th class="bilgiler-baslik">
+                                                <h3 style="font-weight: 600; font-size: 14px!important;">İl / İlçe /
+                                                    Mahalle</h3>
+                                            </th>
+                                            <th class="bilgiler-baslik">
+                                                <h3 style="font-weight: 600; font-size: 14px!important;">Oda Sayısı</h3>
+                                            </th>
+                                            <th class="bilgiler-baslik">
+                                                <h3 style="font-weight: 600; font-size: 14px!important;">Fiyat</h3>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <style>
+                                        .baslik {
+                                            text-align: left !important;
+                                        }
+
+                                        .bilgiler {
+                                            height: 117px;
+                                            text-align: center;
+                                            vertical-align: middle !important;
+
+                                        }
+
+                                        .baslik-ilan {
+
+                                            text-align: center;
+                                            border-left: 1px solid #DDDDDD;
+                                            border-right: 1px solid #DDDDDD;
+                                            margin-bottom: 4px;
+                                        }
+
+                                        .bilgiler-baslik {
+
+                                            border-right: 1px solid #DDDDDD;
+                                            border-left: 1px solid #DDDDDD;
+                                            text-align: center;
+                                            vertical-align: middle !important;
+                                        }
+                                    </style>
+                                    <tbody>
+                                        {% for item in data %}
+                                        <a href="{% url 'estate_details' pk=item.pk %}">
+                                            <tr onclick="window.location='{% url 'estate_details' pk=item.pk %}';"
+                                                style="cursor: pointer;" style="align-items:center;">
+                                                <td><img width="200"
+                                                        style="border-radius:3px;   height: 100px; object-fit: cover;"
+                                                        src="{{item.image.image.url}}"></td>
+                                                <td class="bilgiler">
+                                                    {% if item.estate_rent_contrat %}
+                                                    Kiralandı (Kontrat Mevcut)
+                                                    {% elif item.estate_renter %}
+                                                    Kiralandı
+                                                    {% else %}
+                                                    {{item.estate_status}}
+                                                    {% endif %}
+                                                </td>
+                                                <td class="bilgiler baslik">{{item.title}}</td>
+                                                <td class="bilgiler">{{item.city}} / {{item.county}} / {{item.region}}
+                                                </td>
+                                                <td class="bilgiler">{{item.room_count}}</td>
+
+                                                <td class="bilgiler">{{item.price|intcomma}} ₺</td>
+                                            </tr>
+                                        </a>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <div class="text-center">
+                                    <div class="btn-group">
+                                        {% if data.has_previous %}
+                                        <a class="btn btn-white" type="button"
+                                            href="?page={{data.previous_page_number}}{% if view %}&view={{view}}{% endif %}{% if sort %}&sort={{sort}}{% endif %}{% if status %}&status={{status}}{% endif %}">
+                                            <i class="fa fa-chevron-left"></i>
+                                        </a>
                                         {% endif %}
-                                    </td>
-                                    <td>{{item.price|intcomma}} ₺</td>
-                                </tr>
-                            </a>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    <div class="text-center">
-                        <div class="btn-group">
-                            {% if data.has_previous %}
-                            <a class="btn btn-white" type="button"
-                                href="?page={{data.previous_page_number}}{% if view %}&view={{view}}{% endif %}{% if sort %}&sort={{sort}}{% endif %}{% if status %}&status={{status}}{% endif %}">
-                                <i class="fa fa-chevron-left"></i>
-                            </a>
-                            {% endif %}
 
-                            {% for page_num in page_range %}
-                            <a class="btn btn-white {% if page_num == data.number %} active {% endif %}" type="button"
-                                href="?page={{page_num}}{% if view %}&view={{view}}{% endif %}{% if sort %}&sort={{sort}}{% endif %}{% if status %}&status={{status}}{% endif %}">{{page_num}}</a>
-                            {% endfor %}
+                                        {% for page_num in page_range %}
+                                        <a class="btn btn-white {% if page_num == data.number %} active {% endif %}"
+                                            type="button"
+                                            href="?page={{page_num}}{% if view %}&view={{view}}{% endif %}{% if sort %}&sort={{sort}}{% endif %}{% if status %}&status={{status}}{% endif %}">{{page_num}}</a>
+                                        {% endfor %}
 
-                            {% if data.has_next %}
-                            <a class="btn btn-white" type="button"
-                                href="?page={{data.next_page_number}}{% if view %}&view={{view}}{% endif %}{% if sort %}&sort={{sort}}{% endif %}{% if status %}&status={{status}}{% endif %}">
-                                <i class="fa fa-chevron-right"></i>
-                            </a>
+                                        {% if data.has_next %}
+                                        <a class="btn btn-white" type="button"
+                                            href="?page={{data.next_page_number}}{% if view %}&view={{view}}{% endif %}{% if sort %}&sort={{sort}}{% endif %}{% if status %}&status={{status}}{% endif %}">
+                                            <i class="fa fa-chevron-right"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <h4 class="text-danger">Henüz hiç mülk kaydedilmemiş.</h4>
                             {% endif %}
                         </div>
                     </div>
                 </div>
-                {% else %}
-                <h4 class="text-danger">Henüz hiç mülk kaydedilmemiş.</h4>
-                {% endif %}
+                <div class="col-md-3">
+                    <div class="ibox">
+                        <div class="ibox-content">
+                            <table class="table table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <h3 style="font-weight: 600; font-size: 14px!important;  ">Filtrele</h3>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="border-top:0px!important;">
+                                            <div class="form-group">
+                                                <label class="form-text">Sırala</label>
+                                                <select id="sort" name="sort" class="form-control">
+                                                    <option value="old-to-new">Eskiden Yeniye</option>
+                                                    <option value="new-to-old">Yeniden Eskiye</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-text">Durum</label>
+                                                <select id="status" name="status" class="form-control">
+                                                    <option value="all">Tümü</option>
+                                                    <option value="for-sale">Satılık</option>
+                                                    <option value="for-rent">Kiralık</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-text">Tip</label>
+                                                <select id="status" name="status" class="form-control">
+                                                    <option value="all">Tümü</option>
+                                                    <option value="for-sale">Daire</option>
+                                                    <option value="for-rent">Villa</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-text">Fiyat Aralığı</label>
+                                                <div style="display:flex; align-items:center; gap:5px;">
+                                                    <input id="price-min" name="price-min" value="" class="form-control"
+                                                        placeholder="min">
+                                                    <input id="price-max" name="price-max" value="" class="form-control"
+                                                        placeholder="max">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-text">Metrekare</label>
+                                                <div style="display:flex; align-items:center; gap:5px;">
+                                                    <input id="metre-min" name="metre-min" value="" class="form-control"
+                                                        placeholder="min">
+                                                    <input id="metre-max" name="metre-max" value="" class="form-control"
+                                                        placeholder="max">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-text">Oda Sayısı</label>
+                                                <div
+                                                    style="display:flex; align-items:flex-start; margin-bottom:3px; flex-direction:Column; 
+                                                border:1px solid #DDDDDD; padding-left:15px; padding-right:15px; max-height:100px; overflow-y: scroll; overflow-x:hidden;">
+                                                    <div
+                                                        style="display:flex; gap:3px; flex-direction:row-reverse; justify-content:center; padding-top:8px; padding-bottom:8px">
+                                                        <label style="margin-bottom:0px!important" for="c1">1+0</label>
+                                                        <input type="checkbox" id="c1" name="vehicle1" value="1+0">
+                                                    </div>
+
+                                                    <div
+                                                        style="display:flex; gap:3px; flex-direction:row-reverse; justify-content:center; padding-top:0px!important; padding-bottom:4px">
+                                                        <label style="margin-bottom:0px!important" for="c1">1+0</label>
+                                                        <input type="checkbox" id="c1" name="vehicle1" value="1+0">
+                                                    </div>
+
+                                                    <div
+                                                        style="display:flex; gap:3px; flex-direction:row-reverse; justify-content:center; padding-top:0px!important; padding-bottom:4px">
+                                                        <label style="margin-bottom:0px!important" for="c1">1+0</label>
+                                                        <input type="checkbox" id="c1" name="vehicle1" value="1+0">
+                                                    </div>
+
+                                                    <div
+                                                        style="display:flex; gap:3px; flex-direction:row-reverse; justify-content:center; padding-top:0px!important; padding-bottom:4px">
+                                                        <label style="margin-bottom:0px!important" for="c1">1+0</label>
+                                                        <input type="checkbox" id="c1" name="vehicle1" value="1+0">
+                                                    </div>
+
+                                                    <div
+                                                        style="display:flex; gap:3px; flex-direction:row-reverse; justify-content:center; padding-top:0px!important; padding-bottom:4px">
+                                                        <label style="margin-bottom:0px!important" for="c1">1+0</label>
+                                                        <input type="checkbox" id="c1" name="vehicle1" value="1+0">
+                                                    </div>
+
+                                                    <div
+                                                        style="display:flex; gap:3px; flex-direction:row-reverse; justify-content:center; padding-top:0px!important; padding-bottom:4px">
+                                                        <label style="margin-bottom:0px!important" for="c1">1+0</label>
+                                                        <input type="checkbox" id="c1" name="vehicle1" value="1+0">
+                                                    </div>
+
+                                                    <div
+                                                        style="display:flex; gap:3px; flex-direction:row-reverse; justify-content:center; padding-top:0px!important; padding-bottom:4px">
+                                                        <label style="margin-bottom:0px!important" for="c1">1+0</label>
+                                                        <input type="checkbox" id="c1" name="vehicle1" value="1+0">
+                                                    </div>
+
+                                                    <div
+                                                        style="display:flex; gap:3px; flex-direction:row-reverse; justify-content:center; padding-top:0px!important; padding-bottom:4px">
+                                                        <label style="margin-bottom:0px!important" for="c1">1+0</label>
+                                                        <input type="checkbox" id="c1" name="vehicle1" value="1+0">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
 {% endblock %}
 {% block script %}
 <script>
