@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import transaction
 
 from adminapp.forms import EstateBuyerForm, EstateOwnerForm, EstateRentForm, EstateRenterForm, RealEstateForm
-from adminapp.models import Contrat, County, EstateBuyer, EstateOwner, EstateRenter, EstateStatus, Image, RealEstate, RealEstateAgentCommission, Region
+from adminapp.models import *
 
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
@@ -40,6 +40,10 @@ def index(request):
 
 # ESTATE OPERATIONS
 def estates(request):
+    room_list = RoomCount.objects.all()
+    status_list = EstateStatus.objects.all()
+    type_list = EstateType.objects.all()
+
     # Veritabanı sorgusu
     estates = RealEstate.objects.select_related('city', 'county', 'region', 'room_count', 'estate_status').prefetch_related('image_set')
     
@@ -49,10 +53,25 @@ def estates(request):
 
     # Durum filtresi
     status = request.GET.get("status")
-    if status == "for-sale":
-        estates = estates.filter(estate_status__estate_status="Satılık")
-    elif status == "for-rent":
-        estates = estates.filter(estate_status__estate_status="Kiralık")
+    if status == "all" or status == None:
+        estates
+    elif status != "all":
+        estates = estates.filter(estate_status__pk=status)    
+
+    # Tip filtresi
+    type = request.GET.get("type")
+    if type == "all"  or type == None:
+        estates
+    elif type != "all":
+        estates = estates.filter(estate_type__pk=type)
+
+    # Oda Filtresi
+    room = request.GET.getlist("room_count")
+    if room:
+        estates = estates.filter(room_count__pk__in=room)
+    else:
+        estates = estates.all()
+        
 
     # Sıralama
     sort = request.GET.get("sort")
@@ -70,6 +89,7 @@ def estates(request):
             "region": item.region.region_name,
             "room_count": item.room_count.room_count,
             "estate_status": item.estate_status.estate_status,
+            "estate_type": item.estate_type.estate_type,
             "price": item.price,
             "image": item.image_set.first(),
         }
@@ -78,7 +98,6 @@ def estates(request):
 
     paginator = Paginator(estates, view)
     page = request.GET.get("page")
-
     try:
         data = paginator.page(page)
         page_range = paginator.page_range[max(0, data.number - 5): data.number + 5]
@@ -96,6 +115,10 @@ def estates(request):
         "view": view, "sort": sort, "status": status,
         "total_estate": total_estate,
         "items_per_page": items_per_page,
+        
+        "status_list": status_list,
+        "type_list": type_list,
+        "room_list": room_list,
     }
     return render(request, "adminapp/estates.html", context)
 
