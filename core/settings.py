@@ -94,7 +94,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "realestate",
-        "USER": "postgres",
+        "USER": "admin",
         "PASSWORD": "1234",
         "HOST": "localhost",
         "PORT": "",
