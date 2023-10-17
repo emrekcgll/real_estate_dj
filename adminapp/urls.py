@@ -6,11 +6,6 @@ urlpatterns = [
 
 
     path("estates/", views.estates, name="estates"),
-    path("estates-on-rent/", views.estates_on_rent, name="estates_on_rent"),
-    path("estates-on-rented/", views.estates_on_rented, name="estates_on_rented"),
-    path("estates-on-sale/", views.estates_on_sale, name="estates_on_sale"),
-    path("estates-on-sold/", views.estates_on_sold, name="estates_on_sold"),
-
 
     path("estate/<int:pk>/", views.estate_details, name="estate_details"),
     path("estate-create/", views.estate_create, name="estate_create"),
@@ -46,14 +41,6 @@ urlpatterns = [
     path("buyer-update/<int:pk>/", views.buyer_update, name="buyer_update"),
     path("buyer-delete/<int:pk>/", views.buyer_delete, name="buyer_delete"),
 
-
-
-
-    path("estate_list_ajax/", views.estate_list_ajax, name="estate_list_ajax"),
-    path("estates_on_rent_list_ajax/", views.estates_on_rent_list_ajax, name="estates_on_rent_list_ajax"),
-    path("estates_on_rented_list_ajax/", views.estates_on_rented_list_ajax, name="estates_on_rented_list_ajax"),
-    path("estates_on_sale_list_ajax/", views.estates_on_sale_list_ajax, name="estates_on_sale_list_ajax"),
-    path("estates_on_sold_list_ajax/", views.estates_on_sold_list_ajax, name="estates_on_sold_list_ajax"),
 
     path("get_county_by_city_id/<int:city_id>/", views.get_county_by_city_id, name="get_county_by_city_id"),
     path("get_region_by_county_id/<int:county_id>/", views.get_region_by_county_id, name="get_region_by_county_id"),

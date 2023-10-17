@@ -119,8 +119,8 @@ class RealEstate(models.Model):
     description = models.CharField(max_length=1000)
     estate_number = models.CharField(max_length=10) # GUID ID
     created_date = models.DateField(auto_now_add=True)
-    m2_brut = models.CharField(max_length=10) 
-    m2_net = models.CharField(max_length=10) 
+    m2_brut = models.PositiveIntegerField() 
+    m2_net = models.PositiveIntegerField() 
     heating = models.CharField(max_length=100) # ısıtma şekli
     using_status = models.CharField(max_length=10, null=True, blank=True) # kullanım durumu
     building_years = models.CharField(max_length=10) # bina yaşı
