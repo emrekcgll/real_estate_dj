@@ -204,6 +204,20 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
+                                                <label class="form-text">Bulunduğu Kat</label>
+                                                <div style="display:flex; align-items:center; gap:5px;">
+                                                    <input id="min_location_floor" name="min_location_floor" class="form-control" placeholder="min">
+                                                    <input id="max_location_floor" name="max_location_floor" class="form-control" placeholder="max">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-text">Bina Yaşı</label>
+                                                <div style="display:flex; align-items:center; gap:5px;">
+                                                    <input id="min_building_years" name="min_building_years" class="form-control" placeholder="min">
+                                                    <input id="max_building_years" name="max_building_years" class="form-control" placeholder="max">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
                                                 <label class="form-text">Oda Sayısı</label>
                                                 <div
                                                     style="display:flex; align-items:flex-start; margin-bottom:3px; flex-direction:Column; border:1px solid #DDDDDD; padding-left:15px; padding-right:15px; max-height:100px; overflow-y: scroll; overflow-x:hidden;">
@@ -230,54 +244,5 @@
 </div>
 {% endblock %}
 {% block script %}
-<script>
-    $(document).ready(function () {
-        $("#view").change(function () {
-            $("#view_form").submit();
-        });
-
-        var queryString = window.location.search;
-        var params = new URLSearchParams(queryString);
-
-        var view = params.get("view");
-        if (view === "" || view === null || view === undefined || (view !== "10" && view !== "20" && view !== "30")) {
-            view = 10;
-        }
-        $("#view").val(view);
-
-        var sort = params.get("sort");
-        if (sort === "" || sort === null || sort === undefined) {
-            sort = "new-to-old";
-        }
-        $("#sort").val(sort);
-
-        var status = params.get("status");
-        if (status === "" || status === null || status === undefined) {
-            status = "all";
-        }
-        $("#status").val(status);
-
-        var type = params.get("type");
-        if (type === "" || type === null || type === undefined) {
-            type = "all";
-        }
-        $("#type").val(type);
-
-        var room = params.getAll("room_count");
-        $('input[type="checkbox"]').prop("checked", false);
-        room.forEach(function (value) {
-            $('input[type="checkbox"][value="' + value + '"]').prop("checked", true);
-        });
-
-        var min_price = params.get("min_price");
-        var max_price = params.get("max_price");
-        $("#min_price").val(min_price);
-        $("#max_price").val(max_price);
-
-        var min_metre = params.get("min_metre");
-        var max_metre = params.get("max_metre");
-        $("#min_metre").val(min_metre);
-        $("#max_metre").val(max_metre);
-    });
-</script>
+<script src="{% static 'adminapp/filter.js' %}"></script>
 {% endblock %}
