@@ -49,8 +49,8 @@ def estates(request):
 
 
     # Görüntüleme sayısı
-    view = int(request.GET.get("view", 10))
-    view = min(max(view, 10), 30)  # Min 10, max 30 yap
+    view = int(request.GET.get("view", 1))
+    view = min(max(view, 1), 30)  # Min 10, max 30 yap
 
 
     # Sıralama Filtresi

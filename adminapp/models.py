@@ -125,7 +125,7 @@ class RealEstate(models.Model):
     using_status = models.CharField(max_length=10, null=True, blank=True) # kullanım durumu
     building_years = models.PositiveSmallIntegerField() # bina yaşı
     building_floor = models.PositiveSmallIntegerField() # bina katı
-    location_floor = models.IntegerField(max_length=2) # bulunduğu kat
+    location_floor = models.IntegerField() # bulunduğu kat
     bathrooms_count = models.CharField(max_length=10) # banyo sayısı
     within_site = models.BooleanField(default=False) # site içerisinde mi
     site_name = models.CharField(max_length=75, null=True, blank=True) # site adı
