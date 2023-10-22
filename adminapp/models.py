@@ -115,9 +115,9 @@ class RealEstate(BaseModel):
     m2_net = models.PositiveIntegerField() 
     heating = models.CharField(max_length=100) # ısıtma şekli
     using_status = models.CharField(max_length=10, null=True, blank=True) # kullanım durumu
-    building_years = models.CharField(max_length=10) # bina yaşı
-    building_floor = models.CharField(max_length=10) # bina katı
-    location_floor = models.CharField(max_length=10) # bulunduğu kat
+    building_years = models.PositiveSmallIntegerField() # bina yaşı
+    building_floor = models.PositiveSmallIntegerField() # bina katı
+    location_floor = models.IntegerField() # bulunduğu kat
     bathrooms_count = models.CharField(max_length=10) # banyo sayısı
     within_site = models.BooleanField() # site içerisinde mi
     site_name = models.CharField(max_length=75, null=True, blank=True) # site adı

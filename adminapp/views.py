@@ -46,26 +46,13 @@ def estates(request):
 
     # Veritabanı sorgusu
     estates = RealEstate.objects.select_related('city', 'county', 'region', 'room_count', 'estate_status').prefetch_related('image_set')
-    
+
+
     # Görüntüleme sayısı
-    view = int(request.GET.get("view", 10))
-    view = min(max(view, 10), 30)  # Min 10, max 30 yap
+    view = int(request.GET.get("view", 1))
+    view = min(max(view, 1), 30)  # Min 10, max 30 yap
 
-    # Durum filtresi
-    status = request.GET.get("status")
-    if status != "all" and status is not None:
-        estates = estates.filter(estate_status__pk=status)    
 
-    # Tip filtresi
-    type = request.GET.get("type")
-    if type != "all" and type is not None:
-        estates = estates.filter(estate_type__pk=type)
-
-    # Oda Filtresi
-    room = request.GET.getlist("room_count")
-    if room:
-        estates = estates.filter(room_count__pk__in=room)
-        
     # Sıralama Filtresi
     sort = request.GET.get("sort")
     if sort == "old-to-new":
@@ -73,13 +60,69 @@ def estates(request):
     else:
         estates = estates.order_by("-pk")
 
+
+    # Durum filtresi
+    status = request.GET.get("status")
+    if status != "all" and status is not None:
+        estates = estates.filter(estate_status__pk=status)    
+
+
+    # Tip filtresi
+    type = request.GET.get("type")
+    if type != "all" and type is not None:
+        estates = estates.filter(estate_type__pk=type)
+
+
+    # Oda Filtresi
+    room = request.GET.get("room_count")
+    if room:
+        room_ids = room.split(",")
+        estates = estates.filter(room_count__in=room_ids)
+    
+
+    # Dairenin Bulunduğu Kat Filtresi
+    min_location_floor = request.GET.get("min_location_floor")
+    max_location_floor = request.GET.get("max_location_floor")
+    try:
+        min_location_floor = int(min_location_floor) if min_location_floor else None
+        max_location_floor = int(max_location_floor) if max_location_floor else None
+    except:
+        min_location_floor = None
+        max_location_floor = None
+    if isinstance(max_location_floor, int) or isinstance(min_location_floor, int):
+        if max_location_floor and min_location_floor:
+            estates = estates.filter(location_floor__gte=min_location_floor, location_floor__lte=max_location_floor)
+        elif max_location_floor:
+            estates = estates.filter(location_floor__lte=max_location_floor)
+        elif min_location_floor:
+            estates = estates.filter(location_floor__gte=min_location_floor)
+
+
+    # Bina Yaşı Filtresi
+    min_building_years = request.GET.get("min_building_years")
+    max_building_years = request.GET.get("max_building_years")
+    try:
+        min_building_years = int(min_building_years) if min_building_years else None
+        max_building_years = int(max_building_years) if max_building_years else None
+    except:
+        min_building_years = None
+        max_building_years = None
+    if isinstance(max_building_years, int) or isinstance(min_building_years, int):
+        if max_building_years and min_building_years:
+            estates = estates.filter(building_years__gte=min_building_years, building_years__lte=max_building_years)
+        elif max_building_years:
+            estates = estates.filter(building_years__lte=max_building_years)
+        elif min_building_years:
+            estates = estates.filter(building_years__gte=min_building_years)
+
+
     # Fiyat Filtresi
     max_price = request.GET.get("max_price")
     min_price = request.GET.get("min_price")
     try:
         max_price = int(max_price) if max_price else None
         min_price = int(min_price) if min_price else None
-    except ValueError:
+    except:
         max_price = None
         min_price = None
     if isinstance(max_price, int) or isinstance(min_price, int):
@@ -89,6 +132,7 @@ def estates(request):
             estates = estates.filter(price__lte=float(max_price))
         elif min_price:
             estates = estates.filter(price__gte=float(min_price))
+
 
     # Metre Filtresi
     max_metre = request.GET.get("max_metre")
@@ -124,6 +168,7 @@ def estates(request):
         for item in estates
     ]
 
+
     paginator = Paginator(estates, view)
     page = request.GET.get("page")
     try:
@@ -143,7 +188,6 @@ def estates(request):
         "view": view, "sort": sort, "status": status,
         "total_estate": total_estate,
         "items_per_page": items_per_page,
-        
         "status_list": status_list,
         "type_list": type_list,
         "room_list": room_list,
