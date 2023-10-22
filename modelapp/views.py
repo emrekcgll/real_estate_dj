@@ -7,6 +7,41 @@ import io
 import csv
 
 
+# Default Value OP
+def default_value(request):
+    estate_t = EstateType.objects
+    estate_t.get_or_create(estate_type="Daire")
+    estate_t.get_or_create(estate_type="Villa")
+    estate_t.get_or_create(estate_type="Müstakil")
+    estate_t.get_or_create(estate_type="Doublex")
+    estate_t.get_or_create(estate_type="Triplex")
+
+    estate_s = EstateStatus.objects
+    estate_s.get_or_create(estate_status="Satılık")
+    estate_s.get_or_create(estate_status="Kiralık")
+    
+    from_w = FromWho.objects
+    from_w.get_or_create(from_who="Emlakcıdan")
+    from_w.get_or_create(from_who="Sahibinden")
+
+    room_c = RoomCount.objects
+    room_c.get_or_create(room_count="1+0")
+    room_c.get_or_create(room_count="1+1")
+    room_c.get_or_create(room_count="2+0")
+    room_c.get_or_create(room_count="2+1")
+    room_c.get_or_create(room_count="2+2")
+    room_c.get_or_create(room_count="3+1")
+    room_c.get_or_create(room_count="4+1")
+    room_c.get_or_create(room_count="4+2")
+    room_c.get_or_create(room_count="5+1")
+    room_c.get_or_create(room_count="5+2")
+    room_c.get_or_create(room_count="5+3")
+    room_c.get_or_create(room_count="6+2")
+    messages.success(request, "Database default values successfully created.")
+    return redirect("import_operations")
+
+
+# Import OP
 def import_operations(request):
     return render(request, "modelapp/importoperations.html")
 
@@ -19,9 +54,9 @@ def import_address_data(request):
             reader = csv.reader(csv_file)
             next(reader)
             for row in reader:
-                city_name_csv = row[0].strip().title()
-                county_name_csv = row[1].strip().title()
-                region_name_csv = row[2].strip().title()
+                city_name_csv = row[1].strip().title()
+                county_name_csv = row[2].strip().title()
+                region_name_csv = row[3].strip().title()
                 try:
                     City.objects.get(city_name=city_name_csv)
                 except City.DoesNotExist:
@@ -40,6 +75,8 @@ def import_address_data(request):
     return redirect('import_operations')
 
 
+
+# List OP
 def show_estate_type(request):
     estate_types = EstateType.objects.all()
     data = []
@@ -88,6 +125,8 @@ def show_room_count(request):
     return JsonResponse(response)
 
 
+
+# Create OP
 def create_estate_type(request):
     if request.method == "POST":
         form = EstateTypeForm(request.POST)
@@ -136,6 +175,8 @@ def create_room_count(request):
     return render(request, "modelapp/create_room_count.html", {"form": form})
 
 
+
+# Delete OP
 def delete_estate_type(request, pk):
     value = get_object_or_404(EstateType, pk=pk)
     value.delete()
@@ -164,6 +205,8 @@ def delete_room_count(request, pk):
     return redirect("create_room_count")
 
 
+
+# Update OP
 def update_estate_type(request, pk):
     value = get_object_or_404(EstateType, pk=pk)
     if request.method == "POST":

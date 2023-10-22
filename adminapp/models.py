@@ -2,11 +2,23 @@ from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(get_user_model(), null=True, blank=True, on_delete=models.SET_NULL)
+    class Meta:
+        abstract = True
+    def save(self, *args, **kwargs):
+        if not self.created_by:
+            self.instance.created_by = self.request.user
+        super().save(*args, **kwargs)
+
 
 class City(models.Model): # il
     city_name = models.CharField(max_length=30)
     def __str__(self):
         return self.city_name
+
 
 class County(models.Model): # ilçe
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
@@ -14,79 +26,60 @@ class County(models.Model): # ilçe
     def __str__(self):
         return self.county_name
 
+
 class Region(models.Model): # semt
     county = models.ForeignKey(County, on_delete=models.SET_NULL, null=True, blank=True)
     region_name = models.CharField(max_length=30)
     def __str__(self):
         return self.region_name
 
+
 class EstateType(models.Model):
-    # class TypeChoices(models.TextChoices):
-    #     DAIRE = 'DAIRE', 'Daire'
-    #     VILLA = 'VILLA', 'Villa'
-    #     RESIDENCE = 'RESIDENCE', 'Residence'
-    #     MUSTAKIL_EV = 'MUSTAKIL_EV', 'Müstakil Ev'
-    
     estate_type = models.CharField(max_length=30, unique=True) # Daire, Villa, Residance 
     def __str__(self):
         return self.estate_type
 
-class EstateStatus(models.Model):
-    # class StatusChoices(models.TextChoices):
-    #     SATILIK = 'SATILIK', 'Satılık'
-    #     KIRALIK = 'KIRALIK', 'Kiralık'
 
+class EstateStatus(models.Model):
     estate_status = models.CharField(max_length=30, unique=True) # Satılık, Kiralık
     def __str__(self):
         return self.estate_status
 
-class FromWho(models.Model):
-    # class WhoChoices(models.TextChoices):
-    #     EMLAKCIDAN = 'EMLAKCIDAN', 'Emlakçıdan'
-    #     SAHIBINDEN = 'SAHIBINDEN', 'Sahibinden'
 
+class FromWho(models.Model):
     from_who = models.CharField(max_length=30, unique=True) # kimden, emlakcıdan, sahibinden
     def __str__(self):
         return self.from_who
 
-class RoomCount(models.Model):
-    # class RoomChoices(models.TextChoices):
-    #     BIR_SIFIR = '1+0', '1+0'
-    #     BIR_BIR   = '1+1', '1+1'
-    #     IKI_BIR   = '2+1', '2+1'
-    #     IKI_SIFIR = '2+0', '2+0'
-    #     UC_BIR    = '3+1', '3+1'
-    #     UC_IKI    = '3+2', '3+2'
-    #     UC_SIFIR  = '3+0', '3+0'
-    #     DORT_BIR  = '4+1', '4+1'
-    #     DORT_IKI  = '4+2', '4+2'
-    #     BES_BIR   = '5+1', '5+1'
-    #     BES_IKI   = '5+2', '5+2'
 
+class RoomCount(models.Model):
     room_count = models.CharField(max_length=10, unique=True) # oda sayısı
     def __str__(self):
         return self.room_count
 
 
-class EstateOwner(models.Model):
+class EstateOwner(BaseModel):
     name_surname = models.CharField(max_length=200)
     identity_number = models.CharField(max_length=11, null=True, blank=True)
     phone = models.CharField(max_length=11, null=True, blank=True)
     address = models.CharField(max_length=150, null=True, blank=True)
 
-class EstateRenter(models.Model):
+
+class EstateRenter(BaseModel):
     name_surname = models.CharField(max_length=200)
     identity_number = models.CharField(max_length=11, null=True, blank=True)
     phone = models.CharField(max_length=11, null=True, blank=True)
     address = models.CharField(max_length=150, null=True, blank=True)
 
-class EstateBuyer(models.Model):
+
+class EstateBuyer(BaseModel):
     name_surname = models.CharField(max_length=200)
     identity_number = models.CharField(max_length=11, null=True, blank=True)
     phone = models.CharField(max_length=11, null=True, blank=True)
     address = models.CharField(max_length=150, null=True, blank=True)
 
-class Contrat(models.Model):
+
+class Contrat(BaseModel):
     contract_start_date = models.DateTimeField(auto_now_add=True)
     contract_duration = models.PositiveIntegerField()
     year_rental_price = models.PositiveIntegerField()
@@ -97,7 +90,7 @@ class Contrat(models.Model):
     fixtures_delivered_with_the_rental = models.CharField(max_length=200)
 
 
-class RealEstate(models.Model):
+class RealEstate(BaseModel):
     estate_owner = models.ForeignKey(EstateOwner, on_delete=models.SET_NULL, null=True, blank=True)
     estate_renter = models.ForeignKey(EstateRenter, on_delete=models.SET_NULL, null=True, blank=True)
     estate_buyer = models.ForeignKey(EstateBuyer, on_delete=models.SET_NULL, null=True, blank=True)
@@ -118,7 +111,6 @@ class RealEstate(models.Model):
     slug = models.SlugField(max_length=300, db_index=True)
     description = models.CharField(max_length=1000)
     estate_number = models.CharField(max_length=10) # GUID ID
-    created_date = models.DateField(auto_now_add=True)
     m2_brut = models.PositiveIntegerField() 
     m2_net = models.PositiveIntegerField() 
     heating = models.CharField(max_length=100) # ısıtma şekli
@@ -127,14 +119,14 @@ class RealEstate(models.Model):
     building_floor = models.CharField(max_length=10) # bina katı
     location_floor = models.CharField(max_length=10) # bulunduğu kat
     bathrooms_count = models.CharField(max_length=10) # banyo sayısı
-    within_site = models.BooleanField(default=False) # site içerisinde mi
+    within_site = models.BooleanField() # site içerisinde mi
     site_name = models.CharField(max_length=75, null=True, blank=True) # site adı
-    is_with_firniture = models.BooleanField(default=False) # eşyalı mi
+    is_with_firniture = models.BooleanField() # eşyalı mi
     dues = models.CharField(max_length=10) # aidat
-    is_available_for_loan = models.BooleanField(default=False) # krediye uygun mu
-    is_balcony = models.BooleanField(default=False) # balkon var mı
+    is_available_for_loan = models.BooleanField() # krediye uygun mu
+    is_balcony = models.BooleanField() # balkon var mı
     deed_status = models.CharField(max_length=100) # tapu durumu
-    change = models.BooleanField(default=False) # takas
+    change = models.BooleanField() # takas
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -142,11 +134,9 @@ class RealEstate(models.Model):
         super().save(*args, **kwargs)
 
 
-class RealEstateAgentCommission(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True)
+class RealEstateAgentCommission(BaseModel):
     estate = models.ForeignKey(RealEstate, on_delete=models.SET_NULL, null=True, blank=True)
     comission = models.PositiveIntegerField()
-    created_date = models.DateTimeField(auto_now_add=True)
 
 
 class Image(models.Model):

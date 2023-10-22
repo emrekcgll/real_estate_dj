@@ -2,6 +2,8 @@ from django.urls import path
 from modelapp import views
 
 urlpatterns = [
+    path("default-value/", views.default_value, name="default_value"),
+
     path("import-operations/", views.import_operations, name="import_operations"),
     path("import_address_data/",views.import_address_data, name="import_address_data"),
 
