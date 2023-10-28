@@ -1,14 +1,20 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
+from django.contrib.auth.models import Group
 from adminapp.models import City, County, EstateStatus, EstateType, FromWho, Region, RoomCount
 from modelapp.forms import EstateStatusForm, EstateTypeForm, FromWhoForm, RoomCountForm
+
 import io
 import csv
 
 
 # Default Value OP
 def default_value(request):
+    group = Group.objects
+    group.get_or_create(name="Admin")
+    group.get_or_create(name="Member")
+
     estate_t = EstateType.objects
     estate_t.get_or_create(estate_type="Daire")
     estate_t.get_or_create(estate_type="Villa")
