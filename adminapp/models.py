@@ -1,6 +1,45 @@
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
+# from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
+# class CustomUserManager(BaseUserManager):
+#     def create_user(self, email, password=None, age=None, **extra_fields):
+#         if not email:
+#             raise ValueError('The Email field must be set')
+#         email = self.normalize_email(email)
+#         user = self.model(email=email, age=age, **extra_fields)
+#         user.set_password(password)
+#         user.save(using=self._db)
+#         return user
+
+#     def create_superuser(self, email, password=None, age=None, **extra_fields):
+#         extra_fields.setdefault('is_member', True)  # is_staff yerine is_member olarak değiştirin
+#         extra_fields.setdefault('is_superuser', True)
+
+#         if extra_fields.get('is_member') is not True:
+#             raise ValueError('Superuser must have is_member=True.')  # Superuser'ın is_member olarak değiştirildiğinden emin olun
+#         if extra_fields.get('is_superuser') is not True:
+#             raise ValueError('Superuser must have is_superuser=True.')
+
+#         return self.create_user(email, password, age, **extra_fields)
+
+# class CustomUser(AbstractBaseUser, PermissionsMixin):
+#     email = models.EmailField(unique=True)
+#     first_name = models.CharField(max_length=30)
+#     last_name = models.CharField(max_length=30)
+#     age = models.PositiveIntegerField(null=True, blank=True)
+#     is_member = models.BooleanField(default=False)  # is_staff yerine is_member olarak değiştirin
+#     date_joined = models.DateTimeField(auto_now_add=True)
+
+#     objects = CustomUserManager()
+
+#     USERNAME_FIELD = 'email'
+#     REQUIRED_FIELDS = []
+
+#     def __str__(self):
+#         return self.email
+
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -12,7 +51,6 @@ class BaseModel(models.Model):
         if not self.created_by:
             self.instance.created_by = self.request.user
         super().save(*args, **kwargs)
-
 
 class City(models.Model): # il
     city_name = models.CharField(max_length=30)

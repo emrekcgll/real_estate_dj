@@ -27,7 +27,7 @@ urlpatterns = (
         
         path('web/', include('adminapp.urls')),
         path('', include('accountapp.urls')),
-        path('superuser/', include('modelapp.urls')),
+        path('superuser/', include('superuserapp.urls')),
         path('', include('homeapp.urls')),
 
         path('__debug__/', include(debug_toolbar.urls))

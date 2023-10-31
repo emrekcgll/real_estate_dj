@@ -1,8 +1,13 @@
 from django.urls import path
-from modelapp import views
+from superuserapp import views
 
 urlpatterns = [
     path("default-value/", views.default_value, name="default_value"),
+
+    path("admin-list/",views.admin_list ,name="admin_list"),
+    path("group-list/",views.group_list ,name="group_list"),
+    path("create-admin/",views.create_admin ,name="create_admin"),
+    path("update-group/", views.update_group, name="update_group"),
 
     path("import-operations/", views.import_operations, name="import_operations"),
     path("import_address_data/",views.import_address_data, name="import_address_data"),

@@ -39,12 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'accountapp',
+    'superuserapp',
     'adminapp',
-    'modelapp',
+    'accountapp',
     'homeapp',
     'debug_toolbar',
 ]
+
+# AUTH_USER_MODEL = 'adminapp.CustomUser'
+
 
 MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -138,6 +141,7 @@ LOGOUT_REDIRECT_URL = 'login'
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

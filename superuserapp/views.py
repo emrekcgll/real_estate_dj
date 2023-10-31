@@ -1,12 +1,79 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from adminapp.models import City, County, EstateStatus, EstateType, FromWho, Region, RoomCount
-from modelapp.forms import EstateStatusForm, EstateTypeForm, FromWhoForm, RoomCountForm
+from superuserapp.forms import EstateStatusForm, EstateTypeForm, FromWhoForm, RoomCountForm
+from django.db import transaction
+from django.db.models import Q
 
 import io
 import csv
+
+from superuserapp.pagging import paginator
+
+
+
+# Admin-Group OP
+@transaction.atomic
+def create_admin(request):
+    if request.method == "POST":
+        response = request.POST
+
+        username = response.get("username").strip()
+        email = response.get("email").strip()
+        password = response.get("password")
+        repassword = response.get("repassword")
+        first_name = response.get("first-name").strip()
+        last_name = response.get("last-name")
+        group = response.get("group").strip()
+
+        if not password == repassword:
+            messages.error(request, 'Girdiğiniz parolalar eşleşmiyor.')
+
+            has_uppercase = any(char.isupper() for char in password)
+            has_lowercase = any(char.islower() for char in password)
+            has_digit = any(char.isdigit() for char in password)
+
+            if not (len(password) > 7 and has_uppercase and has_lowercase and has_digit):
+                messages.error(request, 'Parolanız en az bir büyük harf, bir küçük harf, ve en az bir adet rakam içermelidir.')
+
+                if User.objects.filter(email=email).exists():
+                    messages.error(request, 'Girdiğiniz email adresi ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir email adresi ile yeniden deneyin.')
+                elif User.objects.filter(username=username).exists():
+                    messages.error(request, 'Girdiğiniz username ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir username ile yeniden deneyin.')
+                else:
+                    user = User.objects.create_user(username=username, password=password, email=email, 
+                                                    first_name=first_name, last_name=last_name, 
+                                                    is_active=True, is_staff=True, is_superuser=False)
+                    group, created = Group.objects.get_or_create(name=group)
+                    user.groups.add(group)
+                    user.save()
+    return render("superuserapp/create_admin.html", request)
+
+def admin_list(request):
+    search_query = request.GET.get('search', '')
+    admins = User.objects.filter(is_active=True, is_staff=True)
+    if search_query:
+        admins = admins.filter(Q(username__icontains=search_query) | Q(email__icontains=search_query))
+    return paginator(request, data=admins, view=10, template_name="superuserapp/admin_list.html")
+
+def group_list(request):
+    search_query = request.GET.get('search', '')
+    groups = Group.objects.all()
+    if search_query:
+        groups = groups.filter(name__icontains=search_query)
+    return paginator(request, data=groups, view=10, template_name="superuserapp/group_list.html")
+
+def update_group(request, pk):
+    group = get_object_or_404(Group, pk=pk)
+    if request.method == "POST":
+        group_name = request.POST.get("group_name")
+        group.name=group_name
+        group.save()
+        messages.success(request, 'Emlak dükkan ismi başarı ile güncellendi.')
+        return redirect('group_detail', pk=group.pk)
+    return render(request, "superuserapp/update_group.html")
 
 
 # Default Value OP
@@ -49,7 +116,7 @@ def default_value(request):
 
 # Import OP
 def import_operations(request):
-    return render(request, "modelapp/importoperations.html")
+    return render(request, "superuserapp/importoperations.html")
 
 
 def import_address_data(request):
@@ -142,7 +209,7 @@ def create_estate_type(request):
         else:
             messages.error(request, "Something went wrong.")
     form = EstateTypeForm()
-    return render(request, "modelapp/create_estate_type.html", {"form": form})
+    return render(request, "superuserapp/create_estate_type.html", {"form": form})
 
 
 def create_estate_status(request):
@@ -154,7 +221,7 @@ def create_estate_status(request):
         else:
             messages.error(request, "Something went wrong.")
     form = EstateStatusForm()
-    return render(request, "modelapp/create_estate_status.html", {"form": form})
+    return render(request, "superuserapp/create_estate_status.html", {"form": form})
 
 
 def create_from_who(request):
@@ -166,7 +233,7 @@ def create_from_who(request):
         else:
             messages.error(request, "Something went wrong.")
     form = FromWhoForm()
-    return render(request, "modelapp/create_from_who.html", {"form": form})
+    return render(request, "superuserapp/create_from_who.html", {"form": form})
 
 
 def create_room_count(request):
@@ -178,7 +245,7 @@ def create_room_count(request):
         else:
             messages.error(request, "Something went wrong.")
     form = RoomCountForm()
-    return render(request, "modelapp/create_room_count.html", {"form": form})
+    return render(request, "superuserapp/create_room_count.html", {"form": form})
 
 
 
@@ -223,7 +290,7 @@ def update_estate_type(request, pk):
         else:
             messages.error(request, "Something went wrong.")
     form = EstateTypeForm(instance=value)
-    return render(request, "modelapp/update_estate_type.html", {"form": form})
+    return render(request, "superuserapp/update_estate_type.html", {"form": form})
 
 
 def update_estate_status(request, pk):
@@ -236,7 +303,7 @@ def update_estate_status(request, pk):
         else:
             messages.error(request, "Something went wrong.")
     form = EstateStatusForm(instance=value)
-    return render(request, "modelapp/update_estate_status.html", {"form": form})
+    return render(request, "superuserapp/update_estate_status.html", {"form": form})
 
 
 def update_from_who(request, pk):
@@ -249,7 +316,7 @@ def update_from_who(request, pk):
         else:
             messages.error(request, "Something went wrong.")
     form = FromWhoForm(instance=value)
-    return render(request, "modelapp/update_from_who.html", {"form": form})
+    return render(request, "superuserapp/update_from_who.html", {"form": form})
 
 
 def update_room_count(request, pk):
@@ -262,4 +329,4 @@ def update_room_count(request, pk):
         else:
             messages.error(request, "Something went wrong.")
     form = RoomCountForm(instance=value)
-    return render(request, "modelapp/update_room_count.html", {"form": form})
+    return render(request, "superuserapp/update_room_count.html", {"form": form})
