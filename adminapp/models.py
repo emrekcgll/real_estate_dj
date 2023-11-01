@@ -157,14 +157,14 @@ class RealEstate(BaseModel):
     building_floor = models.PositiveSmallIntegerField() # bina katı
     location_floor = models.IntegerField() # bulunduğu kat
     bathrooms_count = models.CharField(max_length=10) # banyo sayısı
-    within_site = models.BooleanField() # site içerisinde mi
+    within_site = models.BooleanField(default=False) # site içerisinde mi
     site_name = models.CharField(max_length=75, null=True, blank=True) # site adı
-    is_with_firniture = models.BooleanField() # eşyalı mi
+    is_with_firniture = models.BooleanField(default=False) # eşyalı mi
     dues = models.CharField(max_length=10) # aidat
-    is_available_for_loan = models.BooleanField() # krediye uygun mu
-    is_balcony = models.BooleanField() # balkon var mı
+    is_available_for_loan = models.BooleanField(default=True) # krediye uygun mu
+    is_balcony = models.BooleanField(default=True) # balkon var mı
     deed_status = models.CharField(max_length=100) # tapu durumu
-    change = models.BooleanField() # takas
+    change = models.BooleanField(default=False) # takas
 
     def save(self, *args, **kwargs):
         if not self.slug:

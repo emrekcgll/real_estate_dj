@@ -1,0 +1,81 @@
+{% load static %}
+
+    <h3>Find your home</h3>
+    <form class="form-find">
+        <div class="form-group mb-2">
+            <input type="text" placeholder="Enter Keywords">
+        </div>
+        <div class="form-group mb-2">
+            <div class="input-box">
+                <select class="niceSelect" style="display: none;">
+                    <option value="1">Locations</option>
+                    <option value="2">Boston</option>
+                    <option value="3">03</option>
+                    <option value="4">Chicago</option>
+                    <option value="5">Denver</option>
+                </select><div class="nice-select niceSelect" tabindex="0"><span class="current">Locations</span><ul class="list"><li data-value="1" class="option selected">Locations</li><li data-value="2" class="option">Boston</li><li data-value="3" class="option">03</li><li data-value="4" class="option">Chicago</li><li data-value="5" class="option">Denver</li></ul></div>
+            </div> 
+        </div>
+        <div class="form-group mb-2">
+            <div class="input-box">
+                <select class="niceSelect" style="display: none;">
+                    <option value="1">All Types</option>
+                    <option value="2">Apartment</option>
+                    <option value="3">Villa</option>
+                    <option value="4">Flat</option>
+                    <option value="5">Rooms</option>
+                    <option value="5">House</option>
+                </select><div class="nice-select niceSelect" tabindex="0"><span class="current">All Types</span><ul class="list"><li data-value="1" class="option selected">All Types</li><li data-value="2" class="option">Apartment</li><li data-value="3" class="option">Villa</li><li data-value="4" class="option">Flat</li><li data-value="5" class="option">Rooms</li><li data-value="5" class="option">House</li></ul></div>
+            </div> 
+        </div>
+        <div class="form-group mb-2">
+            <div class="input-box">
+                <select class="niceSelect" style="display: none;">
+                    <option value="1">All Status</option>
+                    <option value="2">For Rent</option>
+                    <option value="3">For Sale</option>
+                </select><div class="nice-select niceSelect" tabindex="0"><span class="current">All Status</span><ul class="list"><li data-value="1" class="option selected">All Status</li><li data-value="2" class="option">For Rent</li><li data-value="3" class="option">For Sale</li></ul></div>
+            </div> 
+        </div>
+        <div class="form-group mb-2 d-flex justify-content-between">
+            <div class="input-box w-50 me-1">
+                <select class="niceSelect" style="display: none;">
+                    <option value="1">Bedrooms</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select><div class="nice-select niceSelect" tabindex="0"><span class="current">Bedrooms</span><ul class="list"><li data-value="1" class="option selected">Bedrooms</li><li data-value="2" class="option">2</li><li data-value="3" class="option">3</li></ul></div>
+            </div> 
+            <div class="input-box w-50 ms-1">
+                <select class="niceSelect" style="display: none;">
+                    <option value="1">Bathrooms</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select><div class="nice-select niceSelect" tabindex="0"><span class="current">Bathrooms</span><ul class="list"><li data-value="1" class="option selected">Bathrooms</li><li data-value="2" class="option">2</li><li data-value="3" class="option">3</li></ul></div>
+            </div>  
+        </div>
+        <div class="form-group mb-2">
+            <div class="range-slider mt-0">
+                <p class="text-start mb-2">Price Range</p>
+                <div data-min="0" data-max="2000" data-unit="$" data-min-name="min_price" data-max-name="max_price" class="range-slider-ui ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false">
+                    <span class="min-value">500 $</span> 
+                    <span class="max-value">20000 $</span>
+                    <div class="ui-slider-range ui-widget-header ui-corner-all full" style="left: 0%; width: 100%;"></div>
+                <div class="ui-slider-range ui-widget-header ui-corner-all" style="left: 0%; width: 100%;"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 0%;"></a><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 100%;"></a><div class="ui-slider-range ui-widget-header ui-corner-all" style="left: 0%; width: 100%;"></div></div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <div class="form-group mb-2">
+            <div class="range-slider mt-0">
+                <p class="text-start mb-2">Area Size</p>
+                <div data-min="0" data-max="2000" data-unit="$" data-min-name="min_price" data-max-name="max_price" class="range-slider-ui ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false">
+                    <span class="min-value">100 sqft</span> 
+                    <span class="max-value">20000 sqft</span>
+                    <div class="ui-slider-range ui-widget-header ui-corner-all full" style="left: 0%; width: 100%;"></div>
+                <div class="ui-slider-range ui-widget-header ui-corner-all" style="left: 0%; width: 100%;"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 0%;"></a><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 100%;"></a><div class="ui-slider-range ui-widget-header ui-corner-all" style="left: 0%; width: 100%;"></div></div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <div class="form-group text-center w-100">
+            <input type="submit" class="nir-btn w-100" id="submit3" value="Search">
+        </div>
+    </form>
