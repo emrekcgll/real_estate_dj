@@ -1,44 +1,30 @@
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-# from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import Group, User
 
-# class CustomUserManager(BaseUserManager):
-#     def create_user(self, email, password=None, age=None, **extra_fields):
-#         if not email:
-#             raise ValueError('The Email field must be set')
-#         email = self.normalize_email(email)
-#         user = self.model(email=email, age=age, **extra_fields)
-#         user.set_password(password)
-#         user.save(using=self._db)
-#         return user
 
-#     def create_superuser(self, email, password=None, age=None, **extra_fields):
-#         extra_fields.setdefault('is_member', True)  # is_staff yerine is_member olarak değiştirin
-#         extra_fields.setdefault('is_superuser', True)
+class CustomGroup(Group):
+    phone = models.CharField(max_length=255, null=True, blank=True)
+    description = models.CharField(max_length=1024, null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
+    image = models.ImageField(upload_to='group_images/', null=True, blank=True)
+    class Meta:
+        db_table = 'auth_group_additional'
 
-#         if extra_fields.get('is_member') is not True:
-#             raise ValueError('Superuser must have is_member=True.')  # Superuser'ın is_member olarak değiştirildiğinden emin olun
-#         if extra_fields.get('is_superuser') is not True:
-#             raise ValueError('Superuser must have is_superuser=True.')
+class CustomUser(User):
+    is_member = models.BooleanField(default=False)
+    is_manager = models.BooleanField(default=False)
+    is_worker = models.BooleanField(default=False)
+    phone = models.CharField(max_length=255, null=True, blank=True)
+    bio = models.CharField(max_length=1024, null=True, blank=True)
+    image = models.ImageField(upload_to='user_images/', null=True, blank=True)
+    class Meta:
+        db_table = 'auth_user_additional'
 
-#         return self.create_user(email, password, age, **extra_fields)
 
-# class CustomUser(AbstractBaseUser, PermissionsMixin):
-#     email = models.EmailField(unique=True)
-#     first_name = models.CharField(max_length=30)
-#     last_name = models.CharField(max_length=30)
-#     age = models.PositiveIntegerField(null=True, blank=True)
-#     is_member = models.BooleanField(default=False)  # is_staff yerine is_member olarak değiştirin
-#     date_joined = models.DateTimeField(auto_now_add=True)
 
-#     objects = CustomUserManager()
 
-#     USERNAME_FIELD = 'email'
-#     REQUIRED_FIELDS = []
-
-#     def __str__(self):
-#         return self.email
 
 
 class BaseModel(models.Model):
@@ -170,6 +156,9 @@ class RealEstate(BaseModel):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["-pk"]
 
 
 class RealEstateAgentCommission(BaseModel):

@@ -1,0 +1,46 @@
+{% extends "adminapp/_layout.html" %}
+{% load static %}
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert {{message.tags}} alert-dismissible fade show" role="alert">
+    {{message}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endfor %}
+{% endif %}
+
+
+<form method="post">{% csrf_token %}
+    <!-- EMLAKCI DÜKKAN SAHİBİ BİLGİLERİ - COL-MD-6 İLE SOL TARAFA -->
+    
+    <input name="username" placeholder="username" required>
+    <input name="email" placeholder="email" required>
+    <input name="password" placeholder="password" required>
+    <input name="repassword" placeholder="repassword" required>
+    <input name="first-name" placeholder="first-name" required>
+    <input name="last-name" placeholder="last-name" required>
+    <input name="phone" placeholder="phone" required>
+    <input name="bio" placeholder="bio">
+    <input name="image" placeholder="image">
+    
+    <hr>
+
+    <!-- EMLAKCI DÜKKAN BİLGİLERİ - COL-MD-6 İLE SAĞ TARAFA EKLENECEK  -->
+    
+    
+    <input name="group_name" placeholder="group_name" required>
+    <input name="group_phone" placeholder="group_phone">
+    <input name="group_description" placeholder="group_description">
+    <input name="group_location" placeholder="group_location">
+    <input name="group_image" placeholder="group_image">
+    <br><br>
+    <button>submit</button>
+</form>
+
+
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "adminapp/_layout.html" %}
+{% load static %}
+{% block content %}
+
+
+<form method="get">
+    {% csrf_token %}
+    <input name="q" placeholder="search">
+</form>
+<table>
+    <thead>
+        <tr>
+            <th>Emlak Ofisi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in data %}
+        <tr>
+            <td>{{item.name}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+<div class="text-center">
+    <div class="btn-group">
+        {% if data.has_previous %}
+        <a class="btn btn-white" type="button"
+            href="?page={{data.next_page_number}}{% if search_query %}&q={{search_query}}{% endif %}">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        {% endif %}
+
+        {% for page_num in page_range %}
+        <a class="btn btn-white {% if page_num == data.number %} active {% endif %}" type="button"
+            href="?page={{page_num}}{% if search_query %}&q={{search_query}}{% endif %}">{{page_num}}</a>
+        {% endfor %}
+
+        {% if data.has_next %}
+        <a class="btn btn-white" type="button"
+            href="?page={{data.next_page_number}}{% if search_query %}&q={{search_query}}{% endif %}">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

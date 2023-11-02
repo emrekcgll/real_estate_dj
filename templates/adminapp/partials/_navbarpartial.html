@@ -19,6 +19,7 @@
                 </div>
                 <div class="logo-element">IN+</div>
             </li>
+            {% if not request.user.is_superuser %}
             <li class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
                 <a href="{% url 'index' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Panel</span></a>
             </li>
@@ -34,8 +35,20 @@
             <li class="{% if request.resolver_match.url_name == 'renters' %}active{% endif %}">
                 <a href="{% url 'renters' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Kiracılar</span></a>
             </li>
+            {% endif %}
+            <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <a href="{% url 'dashboard' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Dashboard</span></a>
+            </li>
+
             <li>
-                <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Model APP</span><span class="fa arrow"></span></a>
+                <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Üye İşlemleri</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li><a href="{% url 'estate_offices' %}">Emlak Ofisleri</a></li>
+                    <li><a href="{% url 'estate_agents' %}">Emlakcılar</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Model Operasyonları</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">
                     <li><a href="{% url 'import_operations' %}">Import Address Data</a></li>
                     <li><a href="{% url 'create_estate_type' %}">Estate Type</a></li>

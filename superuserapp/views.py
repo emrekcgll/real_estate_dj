@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import Group, User
-from adminapp.models import City, County, EstateStatus, EstateType, FromWho, Region, RoomCount
+from adminapp.models import City, County, CustomGroup, CustomUser, EstateStatus, EstateType, FromWho, Region, RoomCount
 from superuserapp.forms import EstateStatusForm, EstateTypeForm, FromWhoForm, RoomCountForm
 from django.db import transaction
 from django.db.models import Q
@@ -13,8 +13,30 @@ import csv
 from superuserapp.pagging import paginator
 
 
+def dashboard(request):
+    estate_office_count = Group.objects.count()
+    member_count = CustomUser.objects.filter(is_member=True).count()
+    estate_agent_count = CustomUser.objects.filter(
+        Q(is_manager=True) | Q(is_worker=True)).count()
+    context = {
+        "estate_office_count": estate_office_count,
+        "member_count": member_count,
+        "estate_agent_count": estate_agent_count
+    }
+    return render(request, "superuserapp/dashboard.html", context)
+
+
+def search(request):
+    search_input = request.GET.get('search_input', None)
+    
+    if search_input:
+        users = User.objects.filter(username__icontains=search_input).values("username")
+        return render(request, "superuserapp/s.html", {"users": users})
+    return render(request, "superuserapp/s.html")
 
 # Admin-Group OP
+
+
 @transaction.atomic
 def create_admin(request):
     if request.method == "POST":
@@ -26,50 +48,72 @@ def create_admin(request):
         repassword = response.get("repassword")
         first_name = response.get("first-name").strip()
         last_name = response.get("last-name")
-        group = response.get("group").strip()
+        phone = response.get("phone")
+        bio = response.get("bio")
+        image = response.get("image")
+
+        group_name = response.get("group_name").strip()
+        group_phone = response.get("group_phone").strip()
+        group_description = response.get("group_description").strip()
+        group_location = response.get("group_location").strip()
+        group_image = response.get("group_image").strip()
+
+        print(request.POST)
 
         if not password == repassword:
             messages.error(request, 'Girdiğiniz parolalar eşleşmiyor.')
-
+        else:
             has_uppercase = any(char.isupper() for char in password)
             has_lowercase = any(char.islower() for char in password)
             has_digit = any(char.isdigit() for char in password)
 
             if not (len(password) > 7 and has_uppercase and has_lowercase and has_digit):
-                messages.error(request, 'Parolanız en az bir büyük harf, bir küçük harf, ve en az bir adet rakam içermelidir.')
-
+                messages.error(
+                    request, 'Parolanız en az bir büyük harf, bir küçük harf, ve en az bir adet rakam içermelidir.')
+            else:
                 if User.objects.filter(email=email).exists():
-                    messages.error(request, 'Girdiğiniz email adresi ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir email adresi ile yeniden deneyin.')
+                    messages.error(
+                        request, 'Girdiğiniz email adresi ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir email adresi ile yeniden deneyin.')
                 elif User.objects.filter(username=username).exists():
-                    messages.error(request, 'Girdiğiniz username ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir username ile yeniden deneyin.')
+                    messages.error(
+                        request, 'Girdiğiniz username ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir username ile yeniden deneyin.')
                 else:
-                    user = User.objects.create_user(username=username, password=password, email=email, 
-                                                    first_name=first_name, last_name=last_name, 
-                                                    is_active=True, is_staff=True, is_superuser=False)
-                    group, created = Group.objects.get_or_create(name=group)
-                    user.groups.add(group)
+                    user = CustomUser.objects.create_user(username=username, password=password, email=email,
+                                                          first_name=first_name, last_name=last_name,
+                                                          is_active=True, is_staff=False, is_superuser=False,
+                                                          is_member=False, is_manager=True, is_worker=False,
+                                                          phone=phone, bio=bio, image=image)
+                    group_name, created = CustomGroup.objects.get_or_create(name=group_name, phone=group_phone,
+                                                                            description=group_description,
+                                                                            location=group_location,
+                                                                            image=group_image)
+                    user.groups.add(group_name)
                     user.save()
-    return render("superuserapp/create_admin.html", request)
+    return render(request, "superuserapp/create_admin.html")
 
-def admin_list(request):
-    search_query = request.GET.get('search', '')
-    admins = User.objects.filter(is_active=True, is_staff=True)
+
+def estate_agents(request):
+    search_query = request.GET.get('q', '')
+    admins = CustomUser.objects.filter(is_superuser=False, is_staff=False)
     if search_query:
-        admins = admins.filter(Q(username__icontains=search_query) | Q(email__icontains=search_query))
-    return paginator(request, data=admins, view=10, template_name="superuserapp/admin_list.html")
+        admins = admins.filter(Q(username__icontains=search_query) | Q(
+            email__icontains=search_query))
+    return paginator(request, data=admins, view=10, search_query=search_query, template_name="superuserapp/estate_agents.html")
 
-def group_list(request):
-    search_query = request.GET.get('search', '')
+
+def estate_offices(request):
+    search_query = request.GET.get('q', '')
     groups = Group.objects.all()
     if search_query:
         groups = groups.filter(name__icontains=search_query)
-    return paginator(request, data=groups, view=10, template_name="superuserapp/group_list.html")
+    return paginator(request, data=groups, view=10, search_query=search_query, template_name="superuserapp/estate_offices.html")
+
 
 def update_group(request, pk):
     group = get_object_or_404(Group, pk=pk)
     if request.method == "POST":
         group_name = request.POST.get("group_name")
-        group.name=group_name
+        group.name = group_name
         group.save()
         messages.success(request, 'Emlak dükkan ismi başarı ile güncellendi.')
         return redirect('group_detail', pk=group.pk)
@@ -92,7 +136,7 @@ def default_value(request):
     estate_s = EstateStatus.objects
     estate_s.get_or_create(estate_status="Satılık")
     estate_s.get_or_create(estate_status="Kiralık")
-    
+
     from_w = FromWho.objects
     from_w.get_or_create(from_who="Emlakcıdan")
     from_w.get_or_create(from_who="Sahibinden")
@@ -148,7 +192,6 @@ def import_address_data(request):
     return redirect('import_operations')
 
 
-
 # List OP
 def show_estate_type(request):
     estate_types = EstateType.objects.all()
@@ -196,7 +239,6 @@ def show_room_count(request):
         })
     response = {"data": data}
     return JsonResponse(response)
-
 
 
 # Create OP
@@ -248,7 +290,6 @@ def create_room_count(request):
     return render(request, "superuserapp/create_room_count.html", {"form": form})
 
 
-
 # Delete OP
 def delete_estate_type(request, pk):
     value = get_object_or_404(EstateType, pk=pk)
@@ -276,7 +317,6 @@ def delete_room_count(request, pk):
     value.delete()
     messages.success(request, "Deleted successfully.")
     return redirect("create_room_count")
-
 
 
 # Update OP
