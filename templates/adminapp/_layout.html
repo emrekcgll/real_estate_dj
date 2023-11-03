@@ -35,6 +35,13 @@
         </div>
     </div>
     {% include "adminapp/partials/_scriptpartial.html" %}
+    {% if messages %}
+        {% for message in messages %}
+                <script>
+                    toastr.{{message.tags}}('{{ message }}');
+                </script>
+        {% endfor %}
+    {% endif %}
     {% block script %}{% endblock %}
 </body>
 

@@ -2,19 +2,21 @@ from django.urls import path
 from superuserapp import views
 
 urlpatterns = [
-    path("search_input/", views.search, name="search_input"),
-    
-
-    path("dashboard/", views.dashboard, name="dashboard"),
+    path("", views.dashboard, name="dashboard"),
     path("default-value/", views.default_value, name="default_value"),
 
 
-    path("estate-offices/",views.estate_offices ,name="estate_offices"),
     path("estate-agents/",views.estate_agents ,name="estate_agents"),
+    path("get-manager/<int:pk>/",views.get_manager ,name="get_manager"),
+    path("create-manager/",views.create_manager ,name="create_manager"),
 
 
-    path("create-admin/",views.create_admin ,name="create_admin"),
-    path("update-group/", views.update_group, name="update_group"),
+
+    path("estate-offices/",views.estate_offices ,name="estate_offices"),
+    path("get-office/<int:pk>/", views.group_details, name="group_details"),
+    path("create-office/", views.create_group, name="create_group"),
+    path("update-office/", views.update_group, name="update_group"),
+    path("delete-office/", views.delete_group, name="delete_group"),
 
 
     path("import-operations/", views.import_operations, name="import_operations"),
@@ -25,7 +27,7 @@ urlpatterns = [
     path("create_estate_status/", views.create_estate_status, name="create_estate_status"),
     path("create_from_who/", views.create_from_who, name="create_from_who"),
     path("create_room_count/", views.create_room_count, name="create_room_count"),
-    
+
 
     path("show_estate_type/", views.show_estate_type, name="show_estate_type"),
     path("show_estate_status/", views.show_estate_status, name="show_estate_status"),
@@ -37,6 +39,7 @@ urlpatterns = [
     path("delete_estate_status/<int:pk>/", views.delete_estate_status, name="delete_estate_status"),
     path("delete_from_who/<int:pk>/", views.delete_from_who, name="delete_from_who"),
     path("delete_room_count/<int:pk>/", views.delete_room_count, name="delete_room_count"),
+
 
     path("update_estate_type/<int:pk>/", views.update_estate_type, name="update_estate_type"),
     path("update_estate_status/<int:pk>/", views.update_estate_status, name="update_estate_status"),

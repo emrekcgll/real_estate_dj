@@ -10,32 +10,13 @@
                         <span class="text-muted text-xs block">{{user.email}} <b class="caret"></b></span>
                     </a>
                     <ul class="dropdown-menu animated fadeInRight m-t-xs">
-                        <li><a class="dropdown-item" href="">Profile</a></li>
-                        <li><a class="dropdown-item" href="">Contacts</a></li>
-                        <li><a class="dropdown-item" href="">Mailbox</a></li>
-                        <li class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="">Logout</a></li>
+                        <li><a class="dropdown-item" href="{% url 'user_profile' %}">Profilim</a></li>
+                        <li><a class="dropdown-item" href="">Emlak Ofisim</a></li>
                     </ul>
                 </div>
                 <div class="logo-element">IN+</div>
             </li>
-            {% if not request.user.is_superuser %}
-            <li class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
-                <a href="{% url 'index' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Panel</span></a>
-            </li>
-            <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
-                <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülkler</span></a>
-            </li>
-            <li class="{% if request.resolver_match.url_name == 'owners' %}active{% endif %}">
-                <a href="{% url 'owners' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülk Sahipleri</span></a>
-            </li>
-            <li class="{% if request.resolver_match.url_name == 'buyers' %}active{% endif %}">
-                <a href="{% url 'buyers' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülk Alanlar</span></a>
-            </li>
-            <li class="{% if request.resolver_match.url_name == 'renters' %}active{% endif %}">
-                <a href="{% url 'renters' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Kiracılar</span></a>
-            </li>
-            {% endif %}
+            {% if request.user.is_superuser %}
             <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                 <a href="{% url 'dashboard' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Dashboard</span></a>
             </li>
@@ -56,7 +37,24 @@
                     <li><a href="{% url 'create_from_who' %}">From Who</a></li>
                     <li><a href="{% url 'create_room_count' %}">Room Count</a></li>
                 </ul>
+            </li> 
+            {% else %}
+            <li class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                <a href="{% url 'index' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Panel</span></a>
             </li>
+            <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
+                <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülkler</span></a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'owners' %}active{% endif %}">
+                <a href="{% url 'owners' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülk Sahipleri</span></a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'buyers' %}active{% endif %}">
+                <a href="{% url 'buyers' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülk Alanlar</span></a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'renters' %}active{% endif %}">
+                <a href="{% url 'renters' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Kiracılar</span></a>
+            </li>
+            {% endif %}
             <li class="special_link">
                 <a href="{% url 'h_index' %}"><i class="fa fa-database"></i> <span class="nav-label">Go Site</span></a>
             </li>

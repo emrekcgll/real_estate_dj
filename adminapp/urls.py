@@ -3,10 +3,10 @@ from adminapp import views
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("profile/", views.user_profile, name="user_profile"),
 
 
     path("estates/", views.estates, name="estates"),
-
     path("estate/<int:pk>/", views.estate_details, name="estate_details"),
     path("estate-create/", views.estate_create, name="estate_create"),
     path("estate-update/<int:pk>/", views.estate_update, name="estate_update"),

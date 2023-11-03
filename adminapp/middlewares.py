@@ -22,7 +22,7 @@ class AdminCheckMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.user.is_authenticated and request.user.is_active and request.user.is_staff:
+        if request.user.is_active:
             response = self.get_response(request)
         else:
             if not request.path.startswith('/web'):

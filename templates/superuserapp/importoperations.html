@@ -23,7 +23,15 @@
                 </form>
             </div>
         </div>
-        <a href="{% url 'default_value' %}"><strong>Automatic Create Data</strong></a>
+        <div class="ibox ">
+            <div class="ibox-title">
+                <h5>Automatic Data</h5>
+            </div>
+            <div class="ibox-content">
+                <label class="form-label">You can create automaticly database value seed with this function.</label><br>
+                <a href="{% url 'default_value' %}"><strong>Create</strong></a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

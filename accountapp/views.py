@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -11,7 +11,12 @@ def account_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("index")
+            if user.is_superuser or user.is_staff:
+                return redirect("dashboard")
+            elif user.customuser.is_manager or user.customuser.is_worker:
+                return redirect("index")
+            elif request.user.is_member:
+                return redirect("h_index")
     return render(request, 'accountapp/login.html')
 
 
@@ -46,3 +51,5 @@ def account_register(request):
                                                     is_active=False, is_staff=False, is_superuser=False)
                     user.save()
                     messages.success(request, 'Hesabınız başarı ile oluşturuldu. Mail adresinizi onayladıktan sonra giriş yapabilirsiniz.')
+
+

@@ -4,11 +4,11 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q, F
 from django.conf import settings
 from django.db import transaction
+from django.core.files.base import ContentFile
 
 from adminapp.forms import EstateBuyerForm, EstateOwnerForm, EstateRentForm, EstateRenterForm, RealEstateForm
 from adminapp.models import *
 
-from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, PageBreak, Spacer
 from reportlab.lib import colors
@@ -16,6 +16,10 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import inch
+from PIL import Image as IMG
+from io import BytesIO
+from os.path import splitext
+
 import os
 import json
 
@@ -40,6 +44,38 @@ def index(request):
     context = {"estates_on_sale": estates_on_sale, "estates_on_sold": estates_on_sold,
                "estates_on_rent": estates_on_rent, "estates_on_rented": estates_on_rented}
     return render(request, 'adminapp/index.html', context)
+
+def user_profile(request):
+    user = get_object_or_404(CustomUser, pk=request.user.pk)
+    group = user.groups.get()
+    custom_group = get_object_or_404(CustomGroup, pk=group)
+    context = {"user": user, "custom_group":custom_group}
+    return render(request, "adminapp/user_profile.html", context)
+
+
+def update_user_profile(request):
+    user = get_object_or_404(CustomUser, pk=request.user.pk)
+    if request.method == "POST":
+        response = request.POST
+
+        username = response.get("username").strip()
+        email = response.get("email").strip()
+        phone = response.get("phone")
+        bio = response.get("bio")
+        image = response.get("image")
+
+        if username or email or phone or bio or image:
+            user.username = username
+            user.email = email
+            user.phone = phone
+            user.bio = bio
+            user.image = image
+
+            user.save()
+
+    context = {"user": user}
+    return render(request, "adminapp/user_profile.html", context)
+
 
 
 # ESTATE OPERATIONS
@@ -238,13 +274,22 @@ def estate_create(request):
             estate_instance = get_object_or_404(RealEstate, pk=data.pk)
             files = request.FILES.getlist("image")
             for image in files:
-                Image.objects.create(
-                    real_estate=estate_instance, image=image)
+                img = IMG.open(image)
+                if img.format != 'WEBP':
+                    output = BytesIO()
+                    img = img.convert("RGB") 
+                    img.save(output, "WEBP")
+                    output.seek(0)
 
+                    file_name, file_extension = splitext(image.name)
+                    if file_extension.lower() == ".jpg" or file_extension.lower() == ".png" or file_extension.lower() == ".jpeg":
+                        file_name = file_name
+                    file_name_with_extension = f'{file_name}.webp'
+                    webp_file = ContentFile(output.read(), name=f'{file_name_with_extension}')
+                    Image.objects.create(real_estate=estate_instance, image=webp_file)
             return redirect("estates")
     else:
         form = RealEstateForm()
-
     response = {"form": form}
     return render(request, "adminapp/estatecreate.html", response)
 
@@ -630,6 +675,7 @@ def buyer_delete(request, pk):
     buyer = get_object_or_404(EstateBuyer, pk=pk)
     buyer.delete()
     return redirect("buyers")
+
 
 
 # AJAX OPERATIONS

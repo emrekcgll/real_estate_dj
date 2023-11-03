@@ -6,39 +6,37 @@ from adminapp.models import City, County, CustomGroup, CustomUser, EstateStatus,
 from superuserapp.forms import EstateStatusForm, EstateTypeForm, FromWhoForm, RoomCountForm
 from django.db import transaction
 from django.db.models import Q
-
 import io
 import csv
-
 from superuserapp.pagging import paginator
 
 
 def dashboard(request):
     estate_office_count = Group.objects.count()
     member_count = CustomUser.objects.filter(is_member=True).count()
-    estate_agent_count = CustomUser.objects.filter(
-        Q(is_manager=True) | Q(is_worker=True)).count()
-    context = {
-        "estate_office_count": estate_office_count,
-        "member_count": member_count,
-        "estate_agent_count": estate_agent_count
-    }
+    estate_agent_count = CustomUser.objects.filter(Q(is_manager=True) | Q(is_worker=True)).count()
+    context = {"estate_office_count": estate_office_count, "member_count": member_count, "estate_agent_count": estate_agent_count}
     return render(request, "superuserapp/dashboard.html", context)
 
 
-def search(request):
-    search_input = request.GET.get('search_input', None)
-    
-    if search_input:
-        users = User.objects.filter(username__icontains=search_input).values("username")
-        return render(request, "superuserapp/s.html", {"users": users})
-    return render(request, "superuserapp/s.html")
-
 # Admin-Group OP
+def estate_agents(request):
+    search_query = request.GET.get('q', '')
+    admins = CustomUser.objects.filter(is_superuser=False, is_staff=False)
+    if search_query:
+        admins = admins.filter(Q(username__icontains=search_query) | Q(
+            email__icontains=search_query))
+    return paginator(request, data=admins, view=10, search_query=search_query, template_name="superuserapp/estate_agents.html")
+
+
+def get_manager(request, pk):
+    user = get_object_or_404(CustomUser, pk=pk)
+    context = {"user": user}
+    return render(request, "superuserapp/get_manager.html", user)
 
 
 @transaction.atomic
-def create_admin(request):
+def create_manager(request):
     if request.method == "POST":
         response = request.POST
 
@@ -72,11 +70,9 @@ def create_admin(request):
                     request, 'Parolanız en az bir büyük harf, bir küçük harf, ve en az bir adet rakam içermelidir.')
             else:
                 if User.objects.filter(email=email).exists():
-                    messages.error(
-                        request, 'Girdiğiniz email adresi ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir email adresi ile yeniden deneyin.')
+                    messages.error(request, 'Girdiğiniz email adresi ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir email adresi ile yeniden deneyin.')
                 elif User.objects.filter(username=username).exists():
-                    messages.error(
-                        request, 'Girdiğiniz username ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir username ile yeniden deneyin.')
+                    messages.error(request, 'Girdiğiniz username ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir username ile yeniden deneyin.')
                 else:
                     user = CustomUser.objects.create_user(username=username, password=password, email=email,
                                                           first_name=first_name, last_name=last_name,
@@ -89,17 +85,12 @@ def create_admin(request):
                                                                             image=group_image)
                     user.groups.add(group_name)
                     user.save()
-    return render(request, "superuserapp/create_admin.html")
+    return render(request, "superuserapp/create_manager.html")
 
 
-def estate_agents(request):
-    search_query = request.GET.get('q', '')
-    admins = CustomUser.objects.filter(is_superuser=False, is_staff=False)
-    if search_query:
-        admins = admins.filter(Q(username__icontains=search_query) | Q(
-            email__icontains=search_query))
-    return paginator(request, data=admins, view=10, search_query=search_query, template_name="superuserapp/estate_agents.html")
 
+
+# Estate Office OP
 
 def estate_offices(request):
     search_query = request.GET.get('q', '')
@@ -109,6 +100,35 @@ def estate_offices(request):
     return paginator(request, data=groups, view=10, search_query=search_query, template_name="superuserapp/estate_offices.html")
 
 
+def group_details(request, pk):
+    group = get_object_or_404(CustomGroup, pk=pk)
+    group_users = group.members.all()
+
+    context = {"group": group, "group_users": group_users}
+    return render(request, "superuserapp/group_details.html", context)
+
+
+@transaction.atomic
+def create_group(request):
+    if request.method == "POST":
+        response = request.POST
+
+        group_name = response.get("group_name").strip()
+        group_phone = response.get("group_phone").strip()
+        group_description = response.get("group_description").strip()
+        group_location = response.get("group_location").strip()
+        group_image = response.get("group_image").strip()
+
+        group_name, created = CustomGroup.objects.get_or_create(name=group_name, phone=group_phone,
+                                                                description=group_description,
+                                                                location=group_location,
+                                                                image=group_image)
+        if created:
+            return redirect("group_detail", pk=group_name.pk)
+    return render(request, "superuserapp/create_admin.html")
+
+
+@transaction.atomic
 def update_group(request, pk):
     group = get_object_or_404(Group, pk=pk)
     if request.method == "POST":
@@ -120,12 +140,59 @@ def update_group(request, pk):
     return render(request, "superuserapp/update_group.html")
 
 
-# Default Value OP
-def default_value(request):
-    group = Group.objects
-    group.get_or_create(name="Admin")
-    group.get_or_create(name="Member")
+@transaction.atomic
+def delete_group(request, pk):
+    group = get_object_or_404(Group, pk=pk)
+    group_users = group.members.all()
+    group_users.delete()
+    group.delete()
+    return redirect("estate_offices")
 
+
+
+# Import OP
+def import_operations(request):
+    return render(request, "superuserapp/importoperations.html")
+
+
+@transaction.atomic
+def import_address_data(request):
+    if request.method == "POST":
+        csv_file = request.FILES.get("file")
+        if csv_file:
+            if csv_file.name.endswith(".csv"):
+                csv_file = io.TextIOWrapper(csv_file, encoding="utf-8")
+                reader = csv.reader(csv_file)
+                next(reader)
+                for row in reader:
+                    city_name_csv = row[1].strip().title()
+                    county_name_csv = row[2].strip().title()
+                    region_name_csv = row[3].strip().title()
+                    try:
+                        City.objects.get(city_name=city_name_csv)
+                    except City.DoesNotExist:
+                        city = City(city_name=city_name_csv)
+                        city.save()
+                    try:
+                        County.objects.get(county_name=county_name_csv)
+                    except County.DoesNotExist:
+                        county = County(city=city, county_name=county_name_csv)
+                        county.save()
+                    try:
+                        Region.objects.get(region_name=region_name_csv)
+                    except Region.DoesNotExist:
+                        region = Region(county=county, region_name=region_name_csv)
+                        region.save()
+                    messages.success(request, "Veriler başarıyla veritabanına kaydedildi.")
+            else:
+                messages.error(request, "Lütfen CSV uzantılı dosya giriniz.")
+        else:
+            messages.error(request, "Lütfen bir dosya yükleyeniniz.")
+    return redirect('import_operations')
+
+
+@transaction.atomic
+def default_value(request):
     estate_t = EstateType.objects
     estate_t.get_or_create(estate_type="Daire")
     estate_t.get_or_create(estate_type="Villa")
@@ -154,42 +221,9 @@ def default_value(request):
     room_c.get_or_create(room_count="5+2")
     room_c.get_or_create(room_count="5+3")
     room_c.get_or_create(room_count="6+2")
-    messages.success(request, "Database default values successfully created.")
+    messages.success(request, "Değerler veritabanında başarıyla oluşturuldu.")
     return redirect("import_operations")
 
-
-# Import OP
-def import_operations(request):
-    return render(request, "superuserapp/importoperations.html")
-
-
-def import_address_data(request):
-    if request.method == "POST":
-        csv_file = request.FILES.get("file")
-        if csv_file:
-            csv_file = io.TextIOWrapper(csv_file, encoding="utf-8")
-            reader = csv.reader(csv_file)
-            next(reader)
-            for row in reader:
-                city_name_csv = row[1].strip().title()
-                county_name_csv = row[2].strip().title()
-                region_name_csv = row[3].strip().title()
-                try:
-                    City.objects.get(city_name=city_name_csv)
-                except City.DoesNotExist:
-                    city = City(city_name=city_name_csv)
-                    city.save()
-                try:
-                    County.objects.get(county_name=county_name_csv)
-                except County.DoesNotExist:
-                    county = County(city=city, county_name=county_name_csv)
-                    county.save()
-                try:
-                    Region.objects.get(region_name=region_name_csv)
-                except Region.DoesNotExist:
-                    region = Region(county=county, region_name=region_name_csv)
-                    region.save()
-    return redirect('import_operations')
 
 
 # List OP
@@ -241,6 +275,7 @@ def show_room_count(request):
     return JsonResponse(response)
 
 
+
 # Create OP
 def create_estate_type(request):
     if request.method == "POST":
@@ -290,6 +325,7 @@ def create_room_count(request):
     return render(request, "superuserapp/create_room_count.html", {"form": form})
 
 
+
 # Delete OP
 def delete_estate_type(request, pk):
     value = get_object_or_404(EstateType, pk=pk)
@@ -317,6 +353,7 @@ def delete_room_count(request, pk):
     value.delete()
     messages.success(request, "Deleted successfully.")
     return redirect("create_room_count")
+
 
 
 # Update OP
