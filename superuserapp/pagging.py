@@ -2,7 +2,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 
 
-def paginator(request, data, view, template_name, search_query):
+def paginator(request, data, view, template_name, search_query, **kwargs):
     paginator = Paginator(data, view)
     page = request.GET.get("page")
     try:
@@ -23,7 +23,8 @@ def paginator(request, data, view, template_name, search_query):
         'total_items': total_items,
         'items_per_page': items_per_page,
         'page_range': page_range,
-        'search_query': search_query
+        'search_query': search_query,
+        **kwargs
     }
 
     return render(request, template_name, context)

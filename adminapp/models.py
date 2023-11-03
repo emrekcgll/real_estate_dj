@@ -4,13 +4,23 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, User
 
 
-class CustomGroup(Group):
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    class Meta:
+        abstract = True
+
+
+class CustomGroup(BaseModel, Group):
     phone = models.CharField(max_length=255, null=True, blank=True)
     description = models.CharField(max_length=1024, null=True, blank=True)
     location = models.CharField(max_length=255, null=True, blank=True)
     image = models.ImageField(upload_to='group_images/', null=True, blank=True)
     class Meta:
         db_table = 'auth_group_additional'
+        ordering = ["-created_at"]
+
 
 class CustomUser(User):
     is_member = models.BooleanField(default=False)
@@ -21,22 +31,9 @@ class CustomUser(User):
     image = models.ImageField(upload_to='user_images/', null=True, blank=True)
     class Meta:
         db_table = 'auth_user_additional'
+        ordering = ["-date_joined"]
 
 
-
-
-
-
-class BaseModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(get_user_model(), null=True, blank=True, on_delete=models.SET_NULL)
-    class Meta:
-        abstract = True
-    def save(self, *args, **kwargs):
-        if not self.created_by:
-            self.instance.created_by = self.request.user
-        super().save(*args, **kwargs)
 
 class City(models.Model): # il
     city_name = models.CharField(max_length=30)

@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import Group, User
-from adminapp.models import City, County, CustomGroup, CustomUser, EstateStatus, EstateType, FromWho, Region, RoomCount
+from adminapp.models import City, County, CustomGroup, CustomUser, EstateStatus, EstateType, FromWho, RealEstate, Region, RoomCount
 from superuserapp.forms import EstateStatusForm, EstateTypeForm, FromWhoForm, RoomCountForm
 from django.db import transaction
 from django.db.models import Q
@@ -17,6 +17,147 @@ def dashboard(request):
     estate_agent_count = CustomUser.objects.filter(Q(is_manager=True) | Q(is_worker=True)).count()
     context = {"estate_office_count": estate_office_count, "member_count": member_count, "estate_agent_count": estate_agent_count}
     return render(request, "superuserapp/dashboard.html", context)
+
+
+def estate_list(request):
+    room_list = RoomCount.objects.all()
+    status_list = EstateStatus.objects.all()
+    type_list = EstateType.objects.all()
+
+    # Veritabanı sorgusu
+    estates = RealEstate.objects.select_related('city', 'county', 'region', 'room_count', 'estate_status').prefetch_related('image_set')
+
+    # Görüntüleme sayısı
+    view = int(request.GET.get("view", 1))
+    view = min(max(view, 1), 30)  # Min 10, max 30 yap
+
+    # Sıralama Filtresi
+    sort = request.GET.get("sort")
+    if sort == "old-to-new":
+        estates = estates.order_by("pk")
+    else:
+        estates = estates.order_by("-pk")
+
+    # Durum filtresi
+    status = request.GET.get("status")
+    if status != "all" and status is not None:
+        estates = estates.filter(estate_status__pk=status)
+
+    # Tip filtresi
+    type = request.GET.get("type")
+    if type != "all" and type is not None:
+        estates = estates.filter(estate_type__pk=type)
+
+    # Oda Filtresi
+    room = request.GET.get("room_count")
+    if room:
+        room_ids = room.split(",")
+        estates = estates.filter(room_count__in=room_ids)
+
+    # Dairenin Bulunduğu Kat Filtresi
+    min_location_floor = request.GET.get("min_location_floor")
+    max_location_floor = request.GET.get("max_location_floor")
+    try:
+        min_location_floor = int(
+            min_location_floor) if min_location_floor else None
+        max_location_floor = int(
+            max_location_floor) if max_location_floor else None
+    except:
+        min_location_floor = None
+        max_location_floor = None
+    if isinstance(max_location_floor, int) or isinstance(min_location_floor, int):
+        if max_location_floor and min_location_floor:
+            estates = estates.filter(
+                location_floor__gte=min_location_floor, location_floor__lte=max_location_floor)
+        elif max_location_floor:
+            estates = estates.filter(location_floor__lte=max_location_floor)
+        elif min_location_floor:
+            estates = estates.filter(location_floor__gte=min_location_floor)
+
+    # Bina Yaşı Filtresi
+    min_building_years = request.GET.get("min_building_years")
+    max_building_years = request.GET.get("max_building_years")
+    try:
+        min_building_years = int(
+            min_building_years) if min_building_years else None
+        max_building_years = int(
+            max_building_years) if max_building_years else None
+    except:
+        min_building_years = None
+        max_building_years = None
+    if isinstance(max_building_years, int) or isinstance(min_building_years, int):
+        if max_building_years and min_building_years:
+            estates = estates.filter(
+                building_years__gte=min_building_years, building_years__lte=max_building_years)
+        elif max_building_years:
+            estates = estates.filter(building_years__lte=max_building_years)
+        elif min_building_years:
+            estates = estates.filter(building_years__gte=min_building_years)
+
+    # Fiyat Filtresi
+    max_price = request.GET.get("max_price")
+    min_price = request.GET.get("min_price")
+    try:
+        max_price = int(max_price) if max_price else None
+        min_price = int(min_price) if min_price else None
+    except:
+        max_price = None
+        min_price = None
+    if isinstance(max_price, int) or isinstance(min_price, int):
+        if max_price and min_price:
+            estates = estates.filter(price__gte=float(
+                min_price), price__lte=float(max_price))
+        elif max_price:
+            estates = estates.filter(price__lte=float(max_price))
+        elif min_price:
+            estates = estates.filter(price__gte=float(min_price))
+
+    # Metre Filtresi
+    max_metre = request.GET.get("max_metre")
+    min_metre = request.GET.get("min_metre")
+    try:
+        max_metre = int(max_metre) if max_metre else None
+        min_metre = int(min_metre) if min_metre else None
+    except ValueError:
+        max_metre = None
+        min_metre = None
+    if isinstance(max_metre, int) or isinstance(min_metre, int):
+        if max_metre and min_metre:
+            estates = estates.filter(m2_brut__gte=float(
+                min_metre), m2_brut__lte=float(max_metre))
+        elif max_metre:
+            estates = estates.filter(m2_brut__lte=float(max_metre))
+        elif min_metre:
+            estates = estates.filter(m2_brut__gte=float(min_metre))
+
+    search_query = request.GET.get("q")
+    if search_query:
+        estates = estates.filter(title__icontains=search_query)
+
+    estates = [
+        {
+            "pk": item.pk,
+            "title": item.title,
+            "city": item.city.city_name,
+            "county": item.county.county_name,
+            "region": item.region.region_name,
+            "room_count": item.room_count.room_count,
+            "estate_status": item.estate_status.estate_status,
+            "estate_type": item.estate_type.estate_type,
+            "price": item.price,
+            "image": item.image_set.first(),
+        }
+        for item in estates
+    ]
+
+    context = {
+        "sort": sort, "status": status,
+        "status_list": status_list,
+        "type_list": type_list,
+        "room_list": room_list,
+    }
+    return paginator(request, data=estates, view=view, template_name="superuserapp/estate_list.html", search_query=search_query, **context)
+
 
 
 # Admin-Group OP
@@ -66,8 +207,7 @@ def create_manager(request):
             has_digit = any(char.isdigit() for char in password)
 
             if not (len(password) > 7 and has_uppercase and has_lowercase and has_digit):
-                messages.error(
-                    request, 'Parolanız en az bir büyük harf, bir küçük harf, ve en az bir adet rakam içermelidir.')
+                messages.error(request, 'Parolanız en az bir büyük harf, bir küçük harf, ve en az bir adet rakam içermelidir.')
             else:
                 if User.objects.filter(email=email).exists():
                     messages.error(request, 'Girdiğiniz email adresi ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir email adresi ile yeniden deneyin.')
@@ -85,13 +225,14 @@ def create_manager(request):
                                                                             image=group_image)
                     user.groups.add(group_name)
                     user.save()
+                    messages.success(request, 'Emlak Ofisi ve Yöneticisi başarı ile oluşturuldu.')
+                    return redirect("estate_agents")
     return render(request, "superuserapp/create_manager.html")
 
 
 
 
 # Estate Office OP
-
 def estate_offices(request):
     search_query = request.GET.get('q', '')
     groups = Group.objects.all()
@@ -155,7 +296,6 @@ def import_operations(request):
     return render(request, "superuserapp/importoperations.html")
 
 
-@transaction.atomic
 def import_address_data(request):
     if request.method == "POST":
         csv_file = request.FILES.get("file")

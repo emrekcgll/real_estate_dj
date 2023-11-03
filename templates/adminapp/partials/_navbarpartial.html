@@ -20,7 +20,9 @@
             <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                 <a href="{% url 'dashboard' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Dashboard</span></a>
             </li>
-
+            <li class="{% if request.resolver_match.url_name == 'estate_list' %}active{% endif %}">
+                <a href="{% url 'estate_list' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Emlak Listesi</span></a>
+            </li>
             <li>
                 <a href="#"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Üye İşlemleri</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">

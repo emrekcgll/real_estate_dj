@@ -191,6 +191,10 @@ def estates(request):
         elif min_metre:
             estates = estates.filter(m2_brut__gte=float(min_metre))
 
+    search_query = request.GET.get("q")
+    if search_query:
+        estates = estates.filter(title__icontains=search_query)
+
     estates = [
         {
             "pk": item.pk,

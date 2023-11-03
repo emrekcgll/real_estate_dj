@@ -3,7 +3,9 @@ from superuserapp import views
 
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
-    path("default-value/", views.default_value, name="default_value"),
+    path("estate-list/", views.estate_list, name="estate_list"),
+
+
 
 
     path("estate-agents/",views.estate_agents ,name="estate_agents"),
@@ -20,6 +22,7 @@ urlpatterns = [
 
 
     path("import-operations/", views.import_operations, name="import_operations"),
+    path("default-value/", views.default_value, name="default_value"),
     path("import_address_data/",views.import_address_data, name="import_address_data"),
 
 
