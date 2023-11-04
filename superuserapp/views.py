@@ -15,7 +15,8 @@ def dashboard(request):
     estate_office_count = Group.objects.count()
     member_count = CustomUser.objects.filter(is_member=True).count()
     estate_agent_count = CustomUser.objects.filter(Q(is_manager=True) | Q(is_worker=True)).count()
-    context = {"estate_office_count": estate_office_count, "member_count": member_count, "estate_agent_count": estate_agent_count}
+    real_estate_count = RealEstate.objects.count()
+    context = {"estate_office_count": estate_office_count, "member_count": member_count, "estate_agent_count": estate_agent_count, "real_estate_count": real_estate_count}
     return render(request, "superuserapp/dashboard.html", context)
 
 
@@ -28,8 +29,8 @@ def estate_list(request):
     estates = RealEstate.objects.select_related('city', 'county', 'region', 'room_count', 'estate_status').prefetch_related('image_set')
 
     # Görüntüleme sayısı
-    view = int(request.GET.get("view", 1))
-    view = min(max(view, 1), 30)  # Min 10, max 30 yap
+    view = int(request.GET.get("view", 10))
+    view = min(max(view, 10), 30)  # Min 10, max 30 yap
 
     # Sıralama Filtresi
     sort = request.GET.get("sort")

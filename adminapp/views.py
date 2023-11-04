@@ -77,6 +77,41 @@ def update_user_profile(request):
     return render(request, "adminapp/user_profile.html", context)
 
 
+def create_worker(request):
+    if request.METHOD == "POST":
+        response = request.POST
+
+        w_first_name = response.get("w_first_name")
+        w_last_name = response.get("w_last_name")
+        w_username = response.get("w_username")
+        w_email = response.get("w_email")
+        w_password = response.get("w_password")
+        w_repassword = response.get("w_repassword")
+        w_phone = response.get("w_phone")
+        w_bio = response.get("w_bio")
+        w_image = response.get("w_image")
+
+        w_is_superuser = False
+        w_is_staff = False
+        w_is_active = True
+        w_is_manager = False
+        w_is_member = False
+        w_is_worker = True
+
+        if w_first_name and w_last_name and w_username and w_email and w_password and w_repassword and w_phone:
+            if w_password == w_repassword:
+                worker, created = CustomUser.objects.get_or_create(
+                    
+                )
+
+
+
+
+
+
+        
+
+
 
 # ESTATE OPERATIONS
 def estates(request):
@@ -89,8 +124,8 @@ def estates(request):
         'city', 'county', 'region', 'room_count', 'estate_status').prefetch_related('image_set')
 
     # Görüntüleme sayısı
-    view = int(request.GET.get("view", 1))
-    view = min(max(view, 1), 30)  # Min 10, max 30 yap
+    view = int(request.GET.get("view", 10))
+    view = min(max(view, 10), 30)  # Min 10, max 30 yap
 
     # Sıralama Filtresi
     sort = request.GET.get("sort")

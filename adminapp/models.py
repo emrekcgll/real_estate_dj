@@ -34,7 +34,6 @@ class CustomUser(User):
         ordering = ["-date_joined"]
 
 
-
 class City(models.Model): # il
     city_name = models.CharField(max_length=30)
     def __str__(self):
