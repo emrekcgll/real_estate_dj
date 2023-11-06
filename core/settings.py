@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'crispy_forms',
+    'crispy_bootstrap4',
     'superuserapp',
     'adminapp',
     'accountapp',
@@ -138,6 +140,7 @@ LOGOUT_REDIRECT_URL = 'login'
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -3,12 +3,42 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import Group, User
 from adminapp.models import City, County, CustomGroup, CustomUser, EstateStatus, EstateType, FromWho, RealEstate, Region, RoomCount
-from superuserapp.forms import EstateStatusForm, EstateTypeForm, FromWhoForm, RoomCountForm
+from superuserapp.forms import *
 from django.db import transaction
 from django.db.models import Q
 import io
 import csv
 from superuserapp.pagging import paginator
+
+def deneme(request):
+    form = UserForm()
+    if request.method == "POST":
+        form = UserForm(request.POST, request.FILES)
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password"]
+            repassword = form.cleaned_data["repassword"]
+            first_name = form.cleaned_data["first_name"]
+            last_name = form.cleaned_data["last_name"]
+            phone = form.cleaned_data["phone"]
+            bio = form.cleaned_data["bio"]
+            image = form.cleaned_data["image"]
+            is_staff = form.cleaned_data["is_staff"]
+            is_superuser = form.cleaned_data["is_superuser"]
+            is_worker = form.cleaned_data["is_worker"]
+            is_member = form.cleaned_data["is_member"]
+            is_manager = form.cleaned_data["is_manager"]
+            is_active = form.cleaned_data["is_active"]
+            create, user = CustomUser.objects.get_or_create(username=username, password=password, email=email,
+                                                          first_name=first_name, last_name=last_name,
+                                                          is_active=is_active, is_staff=is_staff, is_superuser=is_superuser,
+                                                          is_member=is_member, is_manager=is_manager, is_worker=is_worker,
+                                                          phone=phone, bio=bio, image=image)
+            messages.success(request, "User oluşturuldu.")
+    return render(request, "deneme.html", {"form":form})
+    
+
 
 
 def dashboard(request):
@@ -229,8 +259,6 @@ def create_manager(request):
                     messages.success(request, 'Emlak Ofisi ve Yöneticisi başarı ile oluşturuldu.')
                     return redirect("estate_agents")
     return render(request, "superuserapp/create_manager.html")
-
-
 
 
 # Estate Office OP
