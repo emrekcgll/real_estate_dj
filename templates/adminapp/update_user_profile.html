@@ -2,4 +2,15 @@
 {% load static %}
 {% block content %}
 
+
+<form method="post">
+    {% csrf_token %}
+    <input name="username" placeholder="username" value="{{user.username}}">
+    <input name="phone" placeholder="phone" value="{{user.phone}}">
+    <input name="email" placeholder="email" value="{{user.email}}">
+    <input name="bio" placeholder="bio" value="{{user.bio}}">
+    <input name="image" placeholder="image" value="{{user.image}}">
+    <button type="submit">submit</button>
+</form>
+
 {% endblock %}

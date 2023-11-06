@@ -5,6 +5,7 @@ from django.db.models import Q, F
 from django.conf import settings
 from django.db import transaction
 from django.core.files.base import ContentFile
+from django.contrib import messages
 
 from adminapp.forms import EstateBuyerForm, EstateOwnerForm, EstateRentForm, EstateRenterForm, RealEstateForm
 from adminapp.models import *
@@ -31,16 +32,10 @@ def index(request):
     except:
         satilik = None
         kiralik = None
-
-    estates_on_sale = RealEstate.objects.filter(
-        estate_status=satilik, estate_buyer=None).count() if satilik else 0
-    estates_on_sold = RealEstate.objects.exclude(
-        estate_buyer=None).count() if satilik else 0
-    estates_on_rent = RealEstate.objects.filter(
-        estate_status=kiralik, estate_renter=None).count() if satilik else 0
-    estates_on_rented = RealEstate.objects.exclude(
-        estate_renter=None).count() if satilik else 0
-
+    estates_on_sale = RealEstate.objects.filter(estate_status=satilik, estate_buyer=None).count() if satilik else 0
+    estates_on_sold = RealEstate.objects.exclude(estate_buyer=None).count() if satilik else 0
+    estates_on_rent = RealEstate.objects.filter(estate_status=kiralik, estate_renter=None).count() if satilik else 0
+    estates_on_rented = RealEstate.objects.exclude(estate_renter=None).count() if satilik else 0
     context = {"estates_on_sale": estates_on_sale, "estates_on_sold": estates_on_sold,
                "estates_on_rent": estates_on_rent, "estates_on_rented": estates_on_rented}
     return render(request, 'adminapp/index.html', context)
@@ -70,11 +65,12 @@ def update_user_profile(request):
             user.phone = phone
             user.bio = bio
             user.image = image
-
             user.save()
+            messages.success(request, "Profil bilgileri başarıyla güncellendi.")
+            return redirect("user_profile")
 
     context = {"user": user}
-    return render(request, "adminapp/user_profile.html", context)
+    return render(request, "adminapp/update_user_profile.html", context)
 
 
 def create_worker(request):
@@ -100,9 +96,7 @@ def create_worker(request):
 
         if w_first_name and w_last_name and w_username and w_email and w_password and w_repassword and w_phone:
             if w_password == w_repassword:
-                worker, created = CustomUser.objects.get_or_create(
-                    
-                )
+                worker, created = CustomUser.objects.get_or_create()
 
 
 
@@ -120,8 +114,7 @@ def estates(request):
     type_list = EstateType.objects.all()
 
     # Veritabanı sorgusu
-    estates = RealEstate.objects.select_related(
-        'city', 'county', 'region', 'room_count', 'estate_status').prefetch_related('image_set')
+    estates = RealEstate.objects.select_related('city', 'county', 'region', 'room_count', 'estate_status').prefetch_related('image_set')
 
     # Görüntüleme sayısı
     view = int(request.GET.get("view", 10))
@@ -154,17 +147,14 @@ def estates(request):
     min_location_floor = request.GET.get("min_location_floor")
     max_location_floor = request.GET.get("max_location_floor")
     try:
-        min_location_floor = int(
-            min_location_floor) if min_location_floor else None
-        max_location_floor = int(
-            max_location_floor) if max_location_floor else None
+        min_location_floor = int(min_location_floor) if min_location_floor else None
+        max_location_floor = int(max_location_floor) if max_location_floor else None
     except:
         min_location_floor = None
         max_location_floor = None
     if isinstance(max_location_floor, int) or isinstance(min_location_floor, int):
         if max_location_floor and min_location_floor:
-            estates = estates.filter(
-                location_floor__gte=min_location_floor, location_floor__lte=max_location_floor)
+            estates = estates.filter(location_floor__gte=min_location_floor, location_floor__lte=max_location_floor)
         elif max_location_floor:
             estates = estates.filter(location_floor__lte=max_location_floor)
         elif min_location_floor:
@@ -183,8 +173,7 @@ def estates(request):
         max_building_years = None
     if isinstance(max_building_years, int) or isinstance(min_building_years, int):
         if max_building_years and min_building_years:
-            estates = estates.filter(
-                building_years__gte=min_building_years, building_years__lte=max_building_years)
+            estates = estates.filter(building_years__gte=min_building_years, building_years__lte=max_building_years)
         elif max_building_years:
             estates = estates.filter(building_years__lte=max_building_years)
         elif min_building_years:
@@ -201,8 +190,7 @@ def estates(request):
         min_price = None
     if isinstance(max_price, int) or isinstance(min_price, int):
         if max_price and min_price:
-            estates = estates.filter(price__gte=float(
-                min_price), price__lte=float(max_price))
+            estates = estates.filter(price__gte=float(min_price), price__lte=float(max_price))
         elif max_price:
             estates = estates.filter(price__lte=float(max_price))
         elif min_price:
@@ -219,8 +207,7 @@ def estates(request):
         min_metre = None
     if isinstance(max_metre, int) or isinstance(min_metre, int):
         if max_metre and min_metre:
-            estates = estates.filter(m2_brut__gte=float(
-                min_metre), m2_brut__lte=float(max_metre))
+            estates = estates.filter(m2_brut__gte=float(min_metre), m2_brut__lte=float(max_metre))
         elif max_metre:
             estates = estates.filter(m2_brut__lte=float(max_metre))
         elif min_metre:
@@ -250,8 +237,7 @@ def estates(request):
     page = request.GET.get("page")
     try:
         data = paginator.page(page)
-        page_range = paginator.page_range[max(
-            0, data.number - 5): data.number + 5]
+        page_range = paginator.page_range[max(0, data.number - 5): data.number + 5]
     except PageNotAnInteger:
         data = paginator.page(1)
         page_range = paginator.page_range[:5]

@@ -42,7 +42,7 @@
             </li> 
             {% else %}
             <li class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
-                <a href="{% url 'index' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Panel</span></a>
+                <a href="{% url 'index' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Açılış Ekranı</span></a>
             </li>
             <li class="{% if request.resolver_match.url_name == 'estates' %}active{% endif %}">
                 <a href="{% url 'estates' %}"><i class="fa fa-diamond"></i> <span class="nav-label">Mülkler</span></a>

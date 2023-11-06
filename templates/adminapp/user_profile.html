@@ -1,7 +1,9 @@
 {% extends "adminapp/_layout.html" %}
 {% load static %}
 {% block content %}
+<a href="{% url 'update_user_profile' %}">Profili Düzenle</a>
 
+<br>
 {{user.first_name}}<br>
 {{user.image}}<br>
 

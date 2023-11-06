@@ -4,6 +4,7 @@ from adminapp import views
 urlpatterns = [
     path("", views.index, name="index"),
     path("profile/", views.user_profile, name="user_profile"),
+    path("update-profile/", views.update_user_profile, name="update_user_profile"),
 
 
     path("estates/", views.estates, name="estates"),
