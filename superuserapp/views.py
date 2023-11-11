@@ -11,7 +11,8 @@ import csv
 from superuserapp.pagging import paginator
 
 def deneme(request):
-    form = UserForm()
+    user_form = UserForm()
+    group_form = GroupForm()
     if request.method == "POST":
         form = UserForm(request.POST, request.FILES)
         if form.is_valid():
@@ -24,19 +25,13 @@ def deneme(request):
             phone = form.cleaned_data["phone"]
             bio = form.cleaned_data["bio"]
             image = form.cleaned_data["image"]
-            is_staff = form.cleaned_data["is_staff"]
-            is_superuser = form.cleaned_data["is_superuser"]
-            is_worker = form.cleaned_data["is_worker"]
-            is_member = form.cleaned_data["is_member"]
-            is_manager = form.cleaned_data["is_manager"]
-            is_active = form.cleaned_data["is_active"]
             create, user = CustomUser.objects.get_or_create(username=username, password=password, email=email,
                                                           first_name=first_name, last_name=last_name,
-                                                          is_active=is_active, is_staff=is_staff, is_superuser=is_superuser,
-                                                          is_member=is_member, is_manager=is_manager, is_worker=is_worker,
-                                                          phone=phone, bio=bio, image=image)
+                                                          phone=phone, bio=bio, image=image,
+                                                          is_active=True, is_staff=False, is_superuser=False,
+                                                          is_member=False, is_manager=True, is_worker=False)
             messages.success(request, "User oluşturuldu.")
-    return render(request, "deneme.html", {"form":form})
+    return render(request, "deneme.html", {"user_form":user_form, "group_form":group_form})
     
 
 

@@ -1,24 +1,17 @@
 from django import forms
-from adminapp.models import CustomUser, EstateStatus, EstateType, FromWho, RoomCount
+from adminapp.models import CustomGroup, CustomUser, EstateStatus, EstateType, FromWho, RoomCount
 
 
 class UserForm(forms.Form):
-    username = forms.CharField(label="Username")
-    email = forms.EmailField(label="Email")
-    password = forms.CharField(label="Password" , widget=forms.PasswordInput)
-    repassword = forms.CharField(label="Re-Password", widget=forms.PasswordInput)
     first_name = forms.CharField(label="First Name")
     last_name = forms.CharField(label="Last Name")
     phone = forms.CharField(label="Phone")
     bio = forms.CharField(label="Bio", required=False)
+    username = forms.CharField(label="Username")
+    email = forms.EmailField(label="Email")
+    password = forms.CharField(label="Password" , widget=forms.PasswordInput)
+    repassword = forms.CharField(label="Re-Password", widget=forms.PasswordInput)
     image = forms.ImageField(label="Profil Image", required=False)
-
-    is_staff = forms.BooleanField(label="Is Staff", required=False, initial=False)
-    is_active = forms.BooleanField(label="Is Active", required=False, initial=False)
-    is_superuser = forms.BooleanField(label="Is Superuser", required=False, initial=False)
-    is_member = forms.BooleanField(label="Is Member", required=False, initial=False)
-    is_worker = forms.BooleanField(label="Is Worker", required=False, initial=False)
-    is_manager = forms.BooleanField(label="Is Manager", required=False, initial=False)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -57,7 +50,26 @@ class UserForm(forms.Form):
 
 
 
+class GroupForm(forms.Form):
+    name = forms.CharField(label="Office Name")
+    phone = forms.CharField(max_length=11, label="Office Phone")
+    description = forms.CharField(label="Office Description")
+    image = forms.ImageField(label="Estate Office Image", required=False)
 
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        name = cleaned_data.get("name")
+
+        if name:
+            try:
+                group = CustomGroup.objects.get(name=name)
+                self.add_error("name", "This office is already exists.")
+            except:
+                pass
+
+        return cleaned_data
+    
 
 
 class EstateTypeForm(forms.ModelForm):
