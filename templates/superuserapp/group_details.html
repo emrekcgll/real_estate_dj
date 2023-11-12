@@ -3,5 +3,13 @@
 {% block content %}
 
 {{group.name}}
+{{group.description}}
+{{group.phone}}
+{{group.image}}
+
+{% for user in group_users %}
+{{user.username}}
+{{user.first_name}}
+{% endfor %}
 
 {% endblock %}

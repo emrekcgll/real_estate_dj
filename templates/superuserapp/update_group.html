@@ -1,0 +1,29 @@
+{% extends "adminapp/_layout.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <form method="post" enctype="multipart/form-data">{% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="ibox">
+                        <div class="ibox-content">
+                            {{ user_form|crispy }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="ibox">
+                        <div class="ibox-content">
+                            {{ group_form|crispy }}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-block btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -50,25 +50,49 @@ class UserForm(forms.Form):
 
 
 
-class GroupForm(forms.Form):
-    name = forms.CharField(label="Office Name")
-    phone = forms.CharField(max_length=11, label="Office Phone")
-    description = forms.CharField(label="Office Description")
-    image = forms.ImageField(label="Estate Office Image", required=False)
+
+class GroupForm(forms.ModelForm):
+    class Meta:
+        model = CustomGroup
+        fields = ['name', 'phone', 'description', 'image']
+        labels = {'name': 'Office Name',
+                  'phone': 'Office Phone',
+                  'description': 'Office Description',
+                  'image': 'Estate Office Image'}
 
     def clean(self):
         cleaned_data = super().clean()
-        
-        name = cleaned_data.get("name")
 
-        if name:
-            try:
-                group = CustomGroup.objects.get(name=name)
-                self.add_error("name", "This office is already exists.")
-            except:
-                pass
+        name = self.cleaned_data['name']
+
+        try:
+            group = CustomGroup.objects.get(name=name)
+            self.add_error("name", "This office is already exists.")
+        except CustomGroup.DoesNotExist:
+            pass
 
         return cleaned_data
+    
+
+# class GroupForm(forms.Form):
+#     group_name = forms.CharField(label="Office Name")
+#     group_phone = forms.CharField(max_length=11, label="Office Phone")
+#     group_description = forms.CharField(label="Office Description")
+#     group_image = forms.ImageField(label="Estate Office Image", required=False)
+
+#     def clean(self):
+#         cleaned_data = super().clean()
+        
+#         name = cleaned_data.get("name")
+
+#         if name:
+#             try:
+#                 group = CustomGroup.objects.get(name=name)
+#                 self.add_error("group_name", "This office is already exists.")
+#             except:
+#                 pass
+
+#         return cleaned_data
     
 
 

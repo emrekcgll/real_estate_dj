@@ -10,6 +10,7 @@ urlpatterns = [
 
 
     path("estate-agents/",views.estate_agents ,name="estate_agents"),
+    
     path("get-manager/<int:pk>/",views.get_manager ,name="get_manager"),
     path("create-manager/",views.create_manager ,name="create_manager"),
 
@@ -17,8 +18,7 @@ urlpatterns = [
 
     path("estate-offices/",views.estate_offices ,name="estate_offices"),
     path("get-office/<int:pk>/", views.group_details, name="group_details"),
-    path("create-office/", views.create_group, name="create_group"),
-    path("update-office/", views.update_group, name="update_group"),
+    path("update-office/<int:pk>/", views.update_group, name="update_group"),
     path("delete-office/", views.delete_group, name="delete_group"),
 
 

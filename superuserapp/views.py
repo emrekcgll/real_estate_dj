@@ -10,38 +10,19 @@ import io
 import csv
 from superuserapp.pagging import paginator
 
-def deneme(request):
-    user_form = UserForm()
-    group_form = GroupForm()
-    if request.method == "POST":
-        form = UserForm(request.POST, request.FILES)
-        if form.is_valid():
-            username = form.cleaned_data["username"]
-            email = form.cleaned_data["email"]
-            password = form.cleaned_data["password"]
-            repassword = form.cleaned_data["repassword"]
-            first_name = form.cleaned_data["first_name"]
-            last_name = form.cleaned_data["last_name"]
-            phone = form.cleaned_data["phone"]
-            bio = form.cleaned_data["bio"]
-            image = form.cleaned_data["image"]
-            create, user = CustomUser.objects.get_or_create(username=username, password=password, email=email,
-                                                          first_name=first_name, last_name=last_name,
-                                                          phone=phone, bio=bio, image=image,
-                                                          is_active=True, is_staff=False, is_superuser=False,
-                                                          is_member=False, is_manager=True, is_worker=False)
-            messages.success(request, "User oluşturuldu.")
-    return render(request, "deneme.html", {"user_form":user_form, "group_form":group_form})
-    
 
+def deneme(request):
+    return render(request, "deneme.html")
 
 
 def dashboard(request):
     estate_office_count = Group.objects.count()
     member_count = CustomUser.objects.filter(is_member=True).count()
-    estate_agent_count = CustomUser.objects.filter(Q(is_manager=True) | Q(is_worker=True)).count()
+    estate_agent_count = CustomUser.objects.filter(
+        Q(is_manager=True) | Q(is_worker=True)).count()
     real_estate_count = RealEstate.objects.count()
-    context = {"estate_office_count": estate_office_count, "member_count": member_count, "estate_agent_count": estate_agent_count, "real_estate_count": real_estate_count}
+    context = {"estate_office_count": estate_office_count, "member_count": member_count,
+               "estate_agent_count": estate_agent_count, "real_estate_count": real_estate_count}
     return render(request, "superuserapp/dashboard.html", context)
 
 
@@ -51,7 +32,8 @@ def estate_list(request):
     type_list = EstateType.objects.all()
 
     # Veritabanı sorgusu
-    estates = RealEstate.objects.select_related('city', 'county', 'region', 'room_count', 'estate_status').prefetch_related('image_set')
+    estates = RealEstate.objects.select_related(
+        'city', 'county', 'region', 'room_count', 'estate_status').prefetch_related('image_set')
 
     # Görüntüleme sayısı
     view = int(request.GET.get("view", 10))
@@ -185,81 +167,66 @@ def estate_list(request):
     return paginator(request, data=estates, view=view, template_name="superuserapp/estate_list.html", search_query=search_query, **context)
 
 
-
 # Admin-Group OP
 def estate_agents(request):
     search_query = request.GET.get('q', '')
     admins = CustomUser.objects.filter(is_superuser=False, is_staff=False)
     if search_query:
-        admins = admins.filter(Q(username__icontains=search_query) | Q(
-            email__icontains=search_query))
+        admins = admins.filter(Q(username__icontains=search_query) | Q(email__icontains=search_query))
     return paginator(request, data=admins, view=10, search_query=search_query, template_name="superuserapp/estate_agents.html")
 
 
 def get_manager(request, pk):
     user = get_object_or_404(CustomUser, pk=pk)
     context = {"user": user}
-    return render(request, "superuserapp/get_manager.html", user)
+    return render(request, "superuserapp/get_manager.html", context)
 
 
 @transaction.atomic
 def create_manager(request):
+    user_form = UserForm(prefix='user')
+    group_form = GroupForm(prefix='group')
+
     if request.method == "POST":
-        response = request.POST
+        user_form = UserForm(request.POST, request.FILES, prefix='user')
+        group_form = GroupForm(request.POST, request.FILES, prefix='group')
 
-        username = response.get("username").strip()
-        email = response.get("email").strip()
-        password = response.get("password")
-        repassword = response.get("repassword")
-        first_name = response.get("first-name").strip()
-        last_name = response.get("last-name")
-        phone = response.get("phone")
-        bio = response.get("bio")
-        image = response.get("image")
+        if user_form.is_valid() and group_form.is_valid():
+            user_data = {
+                "username": user_form.cleaned_data["username"],
+                "email": user_form.cleaned_data["email"],
+                "password": user_form.cleaned_data["password"],
+                "first_name": user_form.cleaned_data["first_name"],
+                "last_name": user_form.cleaned_data["last_name"],
+                "phone": user_form.cleaned_data["phone"],
+                "bio": user_form.cleaned_data["bio"],
+                "image": user_form.cleaned_data["image"],
+            }
+            group_data = {
+                "name": group_form.cleaned_data["name"],
+                "phone": group_form.cleaned_data["phone"],
+                "description": group_form.cleaned_data["description"],
+                "image": group_form.cleaned_data["image"],
+            }
 
-        group_name = response.get("group_name").strip()
-        group_phone = response.get("group_phone").strip()
-        group_description = response.get("group_description").strip()
-        group_location = response.get("group_location").strip()
-        group_image = response.get("group_image").strip()
+            user = CustomUser.objects.create_user(**user_data, is_active=True, is_staff=False, is_superuser=False,
+                                                               is_member=False, is_manager=True, is_worker=False)
+            group = CustomGroup.objects.create(**group_data)
 
-        print(request.POST)
+            user.groups.add(group)
+            user.save()
 
-        if not password == repassword:
-            messages.error(request, 'Girdiğiniz parolalar eşleşmiyor.')
+            messages.success(request, "Kullanıcı ve emlak ofisi oluşturuldu.")
+            return redirect("get_manager", user.pk)
         else:
-            has_uppercase = any(char.isupper() for char in password)
-            has_lowercase = any(char.islower() for char in password)
-            has_digit = any(char.isdigit() for char in password)
-
-            if not (len(password) > 7 and has_uppercase and has_lowercase and has_digit):
-                messages.error(request, 'Parolanız en az bir büyük harf, bir küçük harf, ve en az bir adet rakam içermelidir.')
-            else:
-                if User.objects.filter(email=email).exists():
-                    messages.error(request, 'Girdiğiniz email adresi ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir email adresi ile yeniden deneyin.')
-                elif User.objects.filter(username=username).exists():
-                    messages.error(request, 'Girdiğiniz username ile daha önce üyelik oluşturulmuştur. Lütfen farklı bir username ile yeniden deneyin.')
-                else:
-                    user = CustomUser.objects.create_user(username=username, password=password, email=email,
-                                                          first_name=first_name, last_name=last_name,
-                                                          is_active=True, is_staff=False, is_superuser=False,
-                                                          is_member=False, is_manager=True, is_worker=False,
-                                                          phone=phone, bio=bio, image=image)
-                    group_name, created = CustomGroup.objects.get_or_create(name=group_name, phone=group_phone,
-                                                                            description=group_description,
-                                                                            location=group_location,
-                                                                            image=group_image)
-                    user.groups.add(group_name)
-                    user.save()
-                    messages.success(request, 'Emlak Ofisi ve Yöneticisi başarı ile oluşturuldu.')
-                    return redirect("estate_agents")
-    return render(request, "superuserapp/create_manager.html")
+            messages.error(request, "Bir hata oluştu. Lütfen deneyin.")
+    return render(request, "superuserapp/create_manager.html", {"user_form": user_form, "group_form": group_form})
 
 
 # Estate Office OP
 def estate_offices(request):
     search_query = request.GET.get('q', '')
-    groups = Group.objects.all()
+    groups = CustomGroup.objects.all()
     if search_query:
         groups = groups.filter(name__icontains=search_query)
     return paginator(request, data=groups, view=10, search_query=search_query, template_name="superuserapp/estate_offices.html")
@@ -267,42 +234,25 @@ def estate_offices(request):
 
 def group_details(request, pk):
     group = get_object_or_404(CustomGroup, pk=pk)
-    group_users = group.members.all()
-
+    group_users = group.user_set.all()
     context = {"group": group, "group_users": group_users}
     return render(request, "superuserapp/group_details.html", context)
 
 
 @transaction.atomic
-def create_group(request):
-    if request.method == "POST":
-        response = request.POST
-
-        group_name = response.get("group_name").strip()
-        group_phone = response.get("group_phone").strip()
-        group_description = response.get("group_description").strip()
-        group_location = response.get("group_location").strip()
-        group_image = response.get("group_image").strip()
-
-        group_name, created = CustomGroup.objects.get_or_create(name=group_name, phone=group_phone,
-                                                                description=group_description,
-                                                                location=group_location,
-                                                                image=group_image)
-        if created:
-            return redirect("group_detail", pk=group_name.pk)
-    return render(request, "superuserapp/create_admin.html")
-
-
-@transaction.atomic
 def update_group(request, pk):
-    group = get_object_or_404(Group, pk=pk)
+    group = get_object_or_404(CustomGroup, pk=pk)
+    group_form = GroupForm(instance=group)
+    
     if request.method == "POST":
-        group_name = request.POST.get("group_name")
-        group.name = group_name
-        group.save()
-        messages.success(request, 'Emlak dükkan ismi başarı ile güncellendi.')
-        return redirect('group_detail', pk=group.pk)
-    return render(request, "superuserapp/update_group.html")
+        group_form = GroupForm(request.POST, request.FILES, instance=group)
+        if group_form.is_valid():
+            group_form.save()
+            messages.success(request, 'Bilgiler başarı ile güncellendi.')
+            return redirect('group_details', pk=group.pk)    
+        else:
+            messages.error(request, "Bir sorunla karşılaşıldı. Lütfen tekrar deneyin.")
+    return render(request, "superuserapp/update_group.html", {"group_form": group_form})
 
 
 @transaction.atomic
@@ -312,7 +262,6 @@ def delete_group(request, pk):
     group_users.delete()
     group.delete()
     return redirect("estate_offices")
-
 
 
 # Import OP
@@ -345,9 +294,11 @@ def import_address_data(request):
                     try:
                         Region.objects.get(region_name=region_name_csv)
                     except Region.DoesNotExist:
-                        region = Region(county=county, region_name=region_name_csv)
+                        region = Region(
+                            county=county, region_name=region_name_csv)
                         region.save()
-                    messages.success(request, "Veriler başarıyla veritabanına kaydedildi.")
+                    messages.success(
+                        request, "Veriler başarıyla veritabanına kaydedildi.")
             else:
                 messages.error(request, "Lütfen CSV uzantılı dosya giriniz.")
         else:
@@ -387,7 +338,6 @@ def default_value(request):
     room_c.get_or_create(room_count="6+2")
     messages.success(request, "Değerler veritabanında başarıyla oluşturuldu.")
     return redirect("import_operations")
-
 
 
 # List OP
@@ -439,7 +389,6 @@ def show_room_count(request):
     return JsonResponse(response)
 
 
-
 # Create OP
 def create_estate_type(request):
     if request.method == "POST":
@@ -489,7 +438,6 @@ def create_room_count(request):
     return render(request, "superuserapp/create_room_count.html", {"form": form})
 
 
-
 # Delete OP
 def delete_estate_type(request, pk):
     value = get_object_or_404(EstateType, pk=pk)
@@ -517,7 +465,6 @@ def delete_room_count(request, pk):
     value.delete()
     messages.success(request, "Deleted successfully.")
     return redirect("create_room_count")
-
 
 
 # Update OP

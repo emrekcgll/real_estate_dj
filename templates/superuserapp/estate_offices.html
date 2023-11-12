@@ -11,12 +11,14 @@
     <thead>
         <tr>
             <th>Emlak Ofisi</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         {% for item in data %}
         <tr>
             <td>{{item.name}}</td>
+            <td> <a href="{% url 'update_group' pk=item.pk %}">güncelle</a></td>
         </tr>
         {% endfor %}
     </tbody>
